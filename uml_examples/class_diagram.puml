@@ -1,0 +1,243 @@
+@startuml Class Diagram - Ordering System
+
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+' ===== ENUMS =====
+enum Department {
+    STORE
+    LAB
+    ACCOUNTING
+    ADMINISTRATION
+    --
+    -displayName: String
+    -code: int
+    +getByCode(code: int): Department
+    +getInfo(): DepartmentInfo
+}
+
+enum ItemType {
+    FOOD
+    EQUIPMENT
+    CLOTHES
+    UNDEFINED
+    --
+    -discountValue: double
+    +getDiscountValue(): double
+}
+
+' ===== ENTITIES =====
+class Customer {
+    -id: long
+    -firstName: String
+    -lastName: String
+    -userName: String
+    -email: String
+    +updateCustomer(r: RequestCustomer): void
+    +toResponseCustomer(customer: Customer): ResponseCustomer
+}
+
+class Employee {
+    -id: long
+    -name: String
+    -salary: Double
+    -email: String
+    -department: Department
+    -orders: Set<Order>
+    +updateEmployee(r: RequestEmployee): void
+}
+
+class Order {
+    -id: long
+    -orderDateCreated: LocalDateTime
+    -orderDateDelivered: LocalDateTime
+    -employees: Set<Employee>
+    -orderItemSet: Set<OrderItem>
+    -customer: Customer
+    +addOrderItem(item: Item, quantity: int, price: BigDecimal): void
+    +clearOrderItems(): void
+}
+
+class OrderItem {
+    -id: long
+    -order: Order
+    -item: Item
+    -quantity: int
+    -priceAtOrderTime: BigDecimal
+}
+
+class Item {
+    -id: long
+    -name: String
+    -description: String
+    -price: BigDecimal
+    -type: ItemType
+    +updateItem(requestItem: RequestItem): void
+}
+
+' ===== REPOSITORIES =====
+interface CustomerRepository <<Repository>> {
+    +findByEmail(email: String): Optional<Customer>
+    +findByUserName(userName: String): Optional<Customer>
+    +existsByEmail(email: String): boolean
+}
+
+interface EmployeeRepository <<Repository>> {
+    +findByName(name: String): Optional<Employee>
+    +findByEmail(email: String): Optional<Employee>
+    +findByDepartment(department: Department): List<Employee>
+}
+
+interface OrderRepository <<Repository>> {
+    +findByOrderDateCreatedAfter(date: LocalDateTime): List<Order>
+    +findByOrderDateCreatedBetween(start: LocalDateTime, end: LocalDateTime): List<Order>
+    +findByOrderDateDeliveredIsNull(): List<Order>
+    +updateOrderDateDeliveredByOrderId(id: long, date: LocalDateTime): void
+}
+
+interface ItemRepository <<Repository>> {
+}
+
+interface OrderItemRepository <<Repository>> {
+}
+
+' ===== SERVICES =====
+class CustomerService <<Service>> {
+    -customerRepository: CustomerRepository
+    +findCustomerByEmail(email: String): Optional<ResponseCustomer>
+    +findCustomerByUserName(userName: String): Optional<ResponseCustomer>
+    +findCustomerById(id: Long): ResponseCustomer
+    +findAllCustomers(): List<ResponseCustomer>
+    +createCustomer(requestCustomer: RequestCustomer): ResponseCustomer
+    +updateCustomer(customerId: long, requestCustomer: RequestCustomer): ResponseCustomer
+}
+
+class EmployeeService <<Service>> {
+    -employeeRepository: EmployeeRepository
+    +findEmployeeByName(name: String): Optional<ResponseEmployee>
+    +findEmployeeByEmail(email: String): Optional<ResponseEmployee>
+    +findEmployeesByDepartment(department: Department): List<ResponseEmployee>
+    +getAllEmployees(): List<Employee>
+    +getEmployeeById(id: long): Employee
+    +saveEmployee(requestEmployee: RequestEmployee): ResponseEmployee
+    +updateEmployee(employeeId: long, requestEmployee: RequestEmployee): ResponseEmployee
+    +deleteEmployee(id: long): void
+}
+
+class OrderService <<Service>> {
+    -orderRepository: OrderRepository
+    -itemRepository: ItemRepository
+    -customerRepository: CustomerRepository
+    -employeeRepository: EmployeeRepository
+    +createOrder(requestOrder: RequestOrder): ResponseOrder
+    +getOrder(id: long): ResponseOrder
+    +findAll(): List<ResponseOrder>
+    +findCreatedAfter(date: LocalDateTime): List<ResponseOrder>
+    +findUndeliveredOrders(): List<ResponseOrder>
+    +updateOrder(orderId: long, requestOrder: RequestOrder): ResponseOrder
+    +delete(id: long): void
+    +deliverOrder(id: long): void
+    +setEmployeeToOrder(orderId: long, employeeId: long): void
+    +removeEmployeeFromOrder(orderId: long, employeeId: long): void
+}
+
+class ItemService <<Service>> {
+    -itemRepository: ItemRepository
+}
+
+class OrderItemService <<Service>> {
+    -orderItemRepository: OrderItemRepository
+}
+
+' ===== CONTROLLERS =====
+class CustomerController <<Controller>> {
+    -customerService: CustomerService
+}
+
+class EmployeeController <<Controller>> {
+    -employeeService: EmployeeService
+}
+
+class OrderController <<Controller>> {
+    -orderService: OrderService
+}
+
+class ItemController <<Controller>> {
+    -itemService: ItemService
+}
+
+class OrderItemController <<Controller>> {
+    -orderItemService: OrderItemService
+}
+
+' ===== SECURITY =====
+enum Roles {
+    EMPLOYEE_STORE
+    EMPLOYEE_LAB
+    EMPLOYEE_ADMINISTRATION
+    EMPLOYEE_ACCOUNTING
+    CUSTOMER
+}
+
+annotation IsAllowedByRole <<Annotation>> {
+    +value(): Roles[]
+}
+
+class RoleContext <<Utility>> {
+    -{static} currentRole: ThreadLocal<Roles>
+    +{static} setRole(role: Roles): void
+    +{static} getRole(): Roles
+    +{static} clear(): void
+}
+
+class RoleFilter <<Filter>> {
+    +doFilterInternal(request, response, chain): void
+}
+
+class RoleAspect <<Aspect>> {
+    +checkRole(isAllowedByRole: IsAllowedByRole): void
+}
+
+class AccessDeniedException <<Exception>> {
+    -currentRole: Roles
+    -requiredRoles: Roles[]
+    +getErrorType(): ErrorType
+}
+
+' ===== RELATIONSHIPS - ENTITIES =====
+Customer "1" -- "0..*" Order : places >
+Order "0..*" -- "0..*" Employee : handled by >
+Order "1" *-- "0..*" OrderItem : contains >
+Item "1" -- "0..*" OrderItem : included in >
+Employee --> Department : has >
+Item --> ItemType : has >
+
+' ===== RELATIONSHIPS - LAYERS =====
+CustomerController --> CustomerService
+EmployeeController --> EmployeeService
+OrderController --> OrderService
+ItemController --> ItemService
+OrderItemController --> OrderItemService
+
+CustomerService --> CustomerRepository
+EmployeeService --> EmployeeRepository
+OrderService --> OrderRepository
+OrderService --> ItemRepository
+OrderService --> CustomerRepository
+OrderService --> EmployeeRepository
+ItemService --> ItemRepository
+OrderItemService --> OrderItemRepository
+
+CustomerRepository ..> Customer : manages >
+EmployeeRepository ..> Employee : manages >
+OrderRepository ..> Order : manages >
+ItemRepository ..> Item : manages >
+OrderItemRepository ..> OrderItem : manages >
+
+' ===== RELATIONSHIPS - SECURITY =====
+RoleFilter --> RoleContext : sets role >
+RoleAspect --> RoleContext : reads role >
+RoleAspect --> AccessDeniedException : throws >
+RoleAspect ..> IsAllowedByRole : intercepts >
+
+@enduml

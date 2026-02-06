@@ -1,0 +1,73 @@
+package org.example.company.models;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import org.example.company.dto.request.RequestCustomer;
+import org.example.company.dto.response.ResponseCustomer;
+
+@Entity
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "customers")
+public class Customer {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
+
+    @Column
+    private String firstName;
+
+    @Column
+    private String lastName;
+
+    @Column(nullable = false)
+    private String userName;
+
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    public Customer(String firstName, String lastName, String userName, String email) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.userName = userName;
+        this.email = email;
+    }
+
+    public void updateCustomer(RequestCustomer r) {
+        if(r.firstName() != null) this.firstName = r.firstName();
+        if(r.lastName() != null) this.lastName = r.lastName();
+        if(r.userName() != null) this.userName = r.userName();
+        if(r.email() != null) this.email = r.email();
+    }
+
+    public ResponseCustomer toResponseCustomer(Customer customer) {
+        return new ResponseCustomer(customer.getId(), customer.getFirstName(), customer.getLastName(),
+            customer.getUserName());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Customer other)) return false;
+        return id != 0 && id == other.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
+}

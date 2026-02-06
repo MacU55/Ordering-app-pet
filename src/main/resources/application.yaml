@@ -1,0 +1,17 @@
+spring:
+  profiles:
+    group:
+      local:
+        - dev
+      test:
+        - test
+      stage:
+        - stage
+      prod:
+        - prod
+    active: dev
+
+  threads:
+    virtual:
+      enabled: true
+

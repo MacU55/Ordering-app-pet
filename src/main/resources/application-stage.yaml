@@ -1,0 +1,27 @@
+spring:
+  datasource:
+    url: "jdbc:mysql://localhost:3306/db_shop?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC"
+    username: root
+    password: root
+    hikari:
+      maximum-pool-size: 10
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: false
+
+logging:
+  level:
+    root: info
+
+
+company:
+  utility:
+    enabled: true
+  discount:
+    enabled: false
+  notification:
+    email:
+      enabled: false
+    console:
+      enabled: true
