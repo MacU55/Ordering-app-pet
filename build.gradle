@@ -27,18 +27,42 @@ repositories {
 }
 
 dependencies {
+    // Spring Boot
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    //Spring Boot tests
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    //JUnit 5
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation "org.junit.jupiter:junit-jupiter:${junitVersion}"
+
+    //Lombok
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+
+    //MySQL
     runtimeOnly 'com.mysql:mysql-connector-j'
+
+    //Spring Boot devTools
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+    //Spring Boot security
     implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    //AOP
     implementation 'org.springframework.boot:spring-boot-starter-aspectj'
+
+    //Testcontainers for JUnit5
+    testImplementation 'org.testcontainers:junit-jupiter:1.19.1'
+
+    // AssertJ
+    testImplementation 'org.assertj:assertj-core:3.27.7'
+
+    // Testcontainers for MySQL
+    testImplementation 'org.testcontainers:mysql:1.19.1'
 }
 
 test {
