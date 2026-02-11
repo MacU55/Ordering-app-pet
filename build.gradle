@@ -35,10 +35,6 @@ dependencies {
     //Spring Boot tests
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-    //JUnit 5
-    testImplementation platform('org.junit:junit-bom:5.10.0')
-    testImplementation "org.junit.jupiter:junit-jupiter:${junitVersion}"
-
     //Lombok
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
@@ -57,9 +53,6 @@ dependencies {
 
     //Testcontainers for JUnit5
     testImplementation 'org.testcontainers:junit-jupiter:1.19.1'
-
-    // AssertJ
-    testImplementation 'org.assertj:assertj-core:3.27.7'
 
     // Testcontainers for MySQL
     testImplementation 'org.testcontainers:mysql:1.19.1'
