@@ -14,8 +14,8 @@ public class DiscountService {
 
     private static final int DAYS_IN_WEEK_OPERATIONAL = 6;
 
-    public BigDecimal calculateDiscount(double taxValue) {
-        double value = this.isLastWeekOfMonth(LocalDate.now()) ? taxValue * 2 : taxValue;
+    public BigDecimal calculateDiscount(double baseDiscountValue) {
+        double value = this.isLastWeekOfMonth(LocalDate.now()) ? baseDiscountValue * 2 : baseDiscountValue;
         return BigDecimal.valueOf(value);
     }
 

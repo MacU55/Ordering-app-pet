@@ -34,7 +34,8 @@ public class ItemService {
 
     @Transactional(readOnly = true)
     public ResponseItem getItem(long id) {
-        var item = itemRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Item not found for id= " + id));
+        var item =
+            itemRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Item not found for id= " + id));
         return ResponseItem.fromItem(item);
     }
 
@@ -46,14 +47,16 @@ public class ItemService {
 
     @Transactional
     public ResponseItem saveItem(RequestItem requestItem) {
-        Item item = new Item(requestItem.name(), requestItem.description(), requestItem.price(), requestItem.itemType());
+        Item item =
+            new Item(requestItem.name(), requestItem.description(), requestItem.price(), requestItem.itemType());
         itemRepository.save(item);
         return ResponseItem.fromItem(item);
     }
 
     @Transactional
     public ResponseItem updateItem(long id, RequestItem requestItem) {
-        var item = itemRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Item not found for id= " + id));
+        var item =
+            itemRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Item not found for id= " + id));
         item.updateItem(requestItem);
         return ResponseItem.fromItem(item);
     }
@@ -61,14 +64,15 @@ public class ItemService {
 
     @Transactional(readOnly = true)
     public BigDecimal checkDiscountPrice(long itemId) {
-        var item = itemRepository.findById(itemId).orElseThrow(() -> new EntityNotFoundException("Item not found for id= " + itemId));
+        var item = itemRepository.findById(itemId)
+            .orElseThrow(() -> new EntityNotFoundException("Item not found for id= " + itemId));
         return priceCalculatorService.getDiscountPrice(item.getPrice(), item.getType());
     }
 
     @Transactional
     public void deleteItem(long itemId) {
         itemRepository.findById(itemId).ifPresentOrElse(
-            itemRepository::delete,() -> {
+            itemRepository::delete, () -> {
                 log.error("Item not found for id= {}", itemId);
                 throw new EntityNotFoundException("Item not found for id= " + itemId);
             }

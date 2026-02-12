@@ -13,7 +13,7 @@ import java.util.Optional;
 
 
 @SpringBootTest
-public class ItemServiceTest extends BaseTestConfig{
+public class ItemServiceTest extends BaseTestConfig {
 
     private final ItemService itemService;
     private RequestItem baseRequestItem;
@@ -22,6 +22,9 @@ public class ItemServiceTest extends BaseTestConfig{
     public ItemServiceTest(ItemService itemService) {
         this.itemService = itemService;
     }
+
+    @Autowired(required = false)
+    private DiscountService discountService;
 
     @BeforeEach
     public void beforeEach() {
@@ -61,6 +64,16 @@ public class ItemServiceTest extends BaseTestConfig{
         assertEquals(updateRequestItem.price(), updatedItem.price());
         assertEquals(updateRequestItem.itemType(), updatedItem.itemType());
     }
+
+    @Test
+    public void testCheckDiscountPriceForNotProdProfile() {
+        assertNull(discountService);
+        ResponseItem responseItem = itemService.saveItem(baseRequestItem);
+        BigDecimal checkedDiscountPrice = itemService.checkDiscountPrice(responseItem.id());
+        assertEquals(baseRequestItem.price(), checkedDiscountPrice);
+    }
+
+
 
 
 
