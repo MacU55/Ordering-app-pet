@@ -1,8 +1,10 @@
-package org.example.company.service;
+package org.example.company.service.integrationTests;
 
 import org.example.company.dto.request.RequestItem;
 import org.example.company.dto.response.ResponseItem;
 import org.example.company.models.ItemType;
+import org.example.company.service.DiscountService;
+import org.example.company.service.ItemService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

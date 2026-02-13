@@ -48,7 +48,7 @@ public class ItemService {
     @Transactional
     public ResponseItem saveItem(RequestItem requestItem) {
         Item item =
-            new Item(requestItem.name(), requestItem.description(), requestItem.price(), requestItem.itemType());
+            new Item(requestItem);
         itemRepository.save(item);
         return ResponseItem.fromItem(item);
     }

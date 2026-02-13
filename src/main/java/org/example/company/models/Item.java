@@ -40,11 +40,11 @@ public class Item {
     @Enumerated(EnumType.STRING)
     private ItemType type;
 
-    public Item(String name, String description, BigDecimal price, ItemType type) {
-        this.name = name;
-        this.description = description;
-        this.price = price;
-        this.type = type;
+    public Item(RequestItem requestItem) {
+        this.name = requestItem.name();
+        this.description = requestItem.description();
+        this.price = requestItem.price();
+        this.type = requestItem.itemType();
     }
 
     public void updateItem(RequestItem requestItem){
