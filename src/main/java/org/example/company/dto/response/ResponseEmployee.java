@@ -1,13 +1,11 @@
 package org.example.company.dto.response;
 
-import org.example.company.models.Employee;
+import java.util.UUID;
 
 public record ResponseEmployee(
-    long id,
+    UUID uuid,
     String name,
     String email
 ) {
-    public static ResponseEmployee fromEmployee(Employee employee) {
-        return new ResponseEmployee(employee.getId(), employee.getName(), employee.getEmail());
-    }
+
 }

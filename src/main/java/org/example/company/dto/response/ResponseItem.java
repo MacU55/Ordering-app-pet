@@ -1,8 +1,8 @@
 package org.example.company.dto.response;
 
 import java.math.BigDecimal;
-import org.example.company.models.Item;
-import org.example.company.models.ItemType;
+import org.example.company.model.Item;
+import org.example.company.model.ItemType;
 
 public record ResponseItem(
     long id,

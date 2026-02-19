@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.company.dto.request.RequestItem;
 import org.example.company.dto.response.ResponseItem;
-import org.example.company.models.Item;
+import org.example.company.model.Item;
 import org.example.company.repository.ItemRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,7 +35,7 @@ public class ItemService {
     @Transactional(readOnly = true)
     public ResponseItem getItem(long id) {
         var item =
-            itemRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Item not found for id= " + id));
+            itemRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Item not found for uuid= " + id));
         return ResponseItem.fromItem(item);
     }
 
@@ -56,7 +56,7 @@ public class ItemService {
     @Transactional
     public ResponseItem updateItem(long id, RequestItem requestItem) {
         var item =
-            itemRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Item not found for id= " + id));
+            itemRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Item not found for uuid= " + id));
         item.updateItem(requestItem);
         return ResponseItem.fromItem(item);
     }
@@ -65,7 +65,7 @@ public class ItemService {
     @Transactional(readOnly = true)
     public BigDecimal checkDiscountPrice(long itemId) {
         var item = itemRepository.findById(itemId)
-            .orElseThrow(() -> new EntityNotFoundException("Item not found for id= " + itemId));
+            .orElseThrow(() -> new EntityNotFoundException("Item not found for uuid= " + itemId));
         return priceCalculatorService.getDiscountPrice(item.getPrice(), item.getType());
     }
 
@@ -73,8 +73,8 @@ public class ItemService {
     public void deleteItem(long itemId) {
         itemRepository.findById(itemId).ifPresentOrElse(
             itemRepository::delete, () -> {
-                log.error("Item not found for id= {}", itemId);
-                throw new EntityNotFoundException("Item not found for id= " + itemId);
+                log.error("Item not found for uuid= {}", itemId);
+                throw new EntityNotFoundException("Item not found for uuid= " + itemId);
             }
         );
     }

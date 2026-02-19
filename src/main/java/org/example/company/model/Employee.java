@@ -1,29 +1,22 @@
-package org.example.company.models;
+package org.example.company.model;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
-import jakarta.validation.constraints.Min;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.example.company.dto.request.RequestEmployee;
-import org.springframework.transaction.annotation.Transactional;
 
 @Entity
 @Getter
@@ -31,11 +24,10 @@ import org.springframework.transaction.annotation.Transactional;
 @ToString
 @NoArgsConstructor
 @Table(name = "employees")
-public class Employee {
+public class Employee extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    @Column(unique = true, nullable = false, updatable = false)
+    private UUID uuid;
 
     @Column(nullable = false)
     private String name;
@@ -47,24 +39,43 @@ public class Employee {
     private String email;
 
     @Enumerated(EnumType.STRING)
-    private Department department;
+    private DepartmentRole departmentRole;
 
-    public Employee(String name, double salary, String email, Department department) {
+    public Employee(String name, UUID uuid, double salary, String email) {
         this.name = name;
+        this.uuid = uuid;
         this.salary = salary;
         this.email = email;
-        this.department = department;
+    }
+
+    public Employee(String name, double salary) {
+        this.name = name;
+        this.salary = salary;
     }
 
     @ManyToMany(mappedBy = "employees")
     private Set<Order> orders = new HashSet<>();
 
+    @ManyToMany(mappedBy = "employees")
+    private Set<Role> roles = new HashSet<>();
+
     public void updateEmployee(RequestEmployee r) {
         if(r.name() != null) this.name = r.name();
         if(r.salary() != null) this.salary = r.salary();
-        if(r.email() != null) this.email = r.email();
-        if(r.department() != 0) this.department = Department.getByCode(r.department());
+//        if(r.department() != null) this.d
     }
+
+    @PrePersist
+    public void setUUID(){
+        if(this.uuid == null) this.uuid = UUID.randomUUID();
+        this.createdAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void setUpdatedAt(){
+        this.updatedAt = LocalDateTime.now();
+    }
+
 
     @Override
     public boolean equals(Object o) {

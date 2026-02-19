@@ -202,14 +202,14 @@ curl -X GET "http://localhost:8080/employees/by-email?email=alice@company.com" \
 Available departments: `STORE`, `LAB`, `ACCOUNTING`, `ADMINISTRATION`
 
 ```bash
-curl -X GET "http://localhost:8080/employees/by-department?department=STORE" \
+curl -X GET "http://localhost:8080/employees/by-departmentRole?departmentRole=STORE" \
   -H "X-User-Role: EMPLOYEE_ADMINISTRATION"
 ```
 
 ### Get Department Info by Employee ID
 
 ```bash
-curl -X GET http://localhost:8080/employees/1/department \
+curl -X GET http://localhost:8080/employees/1/departmentRole \
   -H "X-User-Role: EMPLOYEE_ADMINISTRATION"
 ```
 
@@ -224,7 +224,7 @@ curl -X GET http://localhost:8080/employees/1/department \
 
 ### Create Employee
 
-Use department code (integer) instead of enum name:
+Use departmentRole code (integer) instead of enum name:
 
 | Code | Department       | Description              |
 |------|------------------|--------------------------|
@@ -245,7 +245,7 @@ curl -X POST http://localhost:8080/employees \
   }'
 ```
 
-> **Note:** Invalid department code returns `400 Bad Request` with error message.
+> **Note:** Invalid departmentRole code returns `400 Bad Request` with error message.
 
 ### Update Employee
 
@@ -257,7 +257,7 @@ curl -X PUT http://localhost:8080/employees/1 \
     "name": "Alice Johnson",
     "salary": 60000.00,
     "email": "alice.johnson@company.com",
-    "department": 4
+    "departmentRole": 4
   }'
 ```
 

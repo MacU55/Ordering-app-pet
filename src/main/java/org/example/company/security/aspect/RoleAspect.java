@@ -4,7 +4,7 @@ import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
-import org.example.company.exceptions.ImpropriateRoleException;
+import org.example.company.exception.ImpropriateRoleException;
 import org.example.company.security.annotation.IsAllowedByRole;
 import org.example.company.security.context.RoleContext;
 import org.example.company.security.model.Roles;

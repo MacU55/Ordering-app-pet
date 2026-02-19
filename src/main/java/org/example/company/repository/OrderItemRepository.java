@@ -1,7 +1,7 @@
 package org.example.company.repository;
 
 import java.util.List;
-import org.example.company.models.OrderItem;
+import org.example.company.model.OrderItem;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

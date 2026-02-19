@@ -8,12 +8,13 @@ import lombok.RequiredArgsConstructor;
 import org.example.company.dto.request.RequestOrderItemCreate;
 import org.example.company.dto.request.RequestOrderItemUpdate;
 import org.example.company.dto.response.ResponseOrderItem;
-import org.example.company.models.Order;
-import org.example.company.models.OrderItem;
-import org.example.company.models.Item;
+import org.example.company.model.Order;
+import org.example.company.model.OrderItem;
+import org.example.company.model.Item;
 import org.example.company.repository.OrderItemRepository;
 import org.example.company.repository.OrderRepository;
 import org.example.company.repository.ItemRepository;
+import org.example.company.service.converter.OrderItemConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,25 +25,26 @@ public class OrderItemService {
     private final OrderItemRepository orderItemRepository;
     private final OrderRepository orderRepository;
     private final ItemRepository itemRepository;
+    private final OrderItemConverter orderItemConverter;
 
     @Transactional(readOnly = true)
     public ResponseOrderItem getById(long id) {
         OrderItem orderItem = orderItemRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("OrderItem not found for id= " + id));
-        return ResponseOrderItem.fromOrderItem(orderItem);
+            .orElseThrow(() -> new EntityNotFoundException("OrderItem not found for uuid= " + id));
+        return orderItemConverter.convertToDTO(orderItem);
     }
 
     @Transactional(readOnly = true)
     public List<ResponseOrderItem> getAll() {
         return orderItemRepository.findAll().stream()
-            .map(ResponseOrderItem::fromOrderItem)
+            .map(orderItemConverter::convertToDTO)
             .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public List<ResponseOrderItem> getByOrderId(long orderId) {
         return orderItemRepository.findByOrder_Id(orderId).stream()
-            .map(ResponseOrderItem::fromOrderItem)
+            .map(orderItemConverter::convertToDTO)
             .collect(Collectors.toList());
     }
 
@@ -54,31 +56,33 @@ public class OrderItemService {
     @Transactional
     public ResponseOrderItem create(RequestOrderItemCreate request) {
         Order order = orderRepository.findById(request.orderId())
-            .orElseThrow(() -> new EntityNotFoundException("Order not found for id= " + request.orderId()));
+            .orElseThrow(() -> new EntityNotFoundException("Order not found for uuid= " + request.orderId()));
         Item item = itemRepository.findById(request.itemId())
-            .orElseThrow(() -> new EntityNotFoundException("Item not found for id= " + request.itemId()));
-        BigDecimal price = request.price() != null ? request.price() : item.getPrice();
+            .orElseThrow(() -> new EntityNotFoundException("Item not found for uuid= " + request.itemId()));
+//        BigDecimal price = request.price() != null ? request.price() : item.getPrice();
+        BigDecimal price = item.getPrice().multiply(new BigDecimal(request.quantity()));
         OrderItem orderItem = new OrderItem(order, item, request.quantity(), price);
-        order.getOrderItemSet().add(orderItem);
+        order.getOrderItemList().add(orderItem);
         orderItemRepository.save(orderItem);
-        return ResponseOrderItem.fromOrderItem(orderItem);
+         return  orderItemConverter.convertToDTO(orderItem);
+//        return ResponseOrderItem.fromOrderItem(orderItem);
     }
 
     @Transactional
     public ResponseOrderItem update(long id, RequestOrderItemUpdate request) {
         OrderItem orderItem = orderItemRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("OrderItem not found for id= " + id));
+            .orElseThrow(() -> new EntityNotFoundException("OrderItem not found for uuid= " + id));
         orderItem.setQuantity(request.quantity());
         if (request.price() != null) {
             orderItem.setPriceAtOrderTime(request.price());
         }
-        return ResponseOrderItem.fromOrderItem(orderItemRepository.save(orderItem));
+        return orderItemConverter.convertToDTO(orderItemRepository.save(orderItem));
     }
 
     @Transactional
     public void delete(long id) {
         if (!orderItemRepository.existsById(id)) {
-            throw new EntityNotFoundException("OrderItem not found for id " + id);
+            throw new EntityNotFoundException("OrderItem not found for uuid " + id);
         }
         orderItemRepository.deleteById(id);
     }

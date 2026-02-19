@@ -2,10 +2,10 @@ package org.example.company.controller.errorHandling;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
-import org.example.company.exceptions.BusinessRuleViolationException;
-import org.example.company.exceptions.EmailAlreadyExistsException;
-import org.example.company.exceptions.ImpropriateRoleException;
-import org.example.company.exceptions.InternalServiceException;
+import org.example.company.exception.BusinessRuleViolationException;
+import org.example.company.exception.EmailAlreadyExistsException;
+import org.example.company.exception.ImpropriateRoleException;
+import org.example.company.exception.InternalServiceException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;

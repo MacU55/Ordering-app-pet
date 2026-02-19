@@ -1,7 +1,7 @@
 package org.example.company.dto.request;
 
 import jakarta.validation.constraints.NotNull;
-import org.example.company.models.Customer;
+import org.example.company.model.Customer;
 
 public record RequestCustomer(
     @NotNull(message = "firstName is mandatory") String firstName,

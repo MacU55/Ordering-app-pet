@@ -1,12 +1,13 @@
 package org.example.company.dto.request;
 
-import java.math.BigDecimal;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
 public record RequestOrderItem(
     @NotNull Long itemId,
-    @Min(value = 1, message = "quantity should be greater than 0") int quantity,
-    BigDecimal price
+    @NotNull Long orderId,
+    @Min(value = 1, message = "quantity should be greater than 0") int quantity
+
+//    BigDecimal price
 ) {
 }

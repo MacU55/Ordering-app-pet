@@ -1,6 +1,6 @@
-package org.example.company.service.notifications.impl;
+package org.example.company.service.notification.impl;
 
-import org.example.company.service.notifications.NotificationService;
+import org.example.company.service.notification.NotificationService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;

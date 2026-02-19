@@ -1,6 +1,6 @@
 package org.example.company.controller;
 
-import org.example.company.service.notifications.NotificationService;
+import org.example.company.service.notification.NotificationService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

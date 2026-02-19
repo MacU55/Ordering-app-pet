@@ -1,9 +1,9 @@
-package org.example.company.models;
+package org.example.company.model;
 
 import lombok.Getter;
 
 @Getter
-public enum Department {
+public enum DepartmentRole {
 
     STORE("Store", 1),
     LAB("Laboratory", 2),
@@ -13,18 +13,18 @@ public enum Department {
     private final String displayName;
     private final int code;
 
-    Department(String displayName, int code) {
+    DepartmentRole(String displayName, int code) {
         this.displayName = displayName;
         this.code = code;
     }
 
-    public static Department getByCode(int code) {
-        for (Department department : values()) {
-            if (department.getCode() == code) {
-                return department;
+    public static DepartmentRole getByCode(int code) {
+        for (DepartmentRole departmentRole : values()) {
+            if (departmentRole.getCode() == code) {
+                return departmentRole;
             }
         }
-        throw new IllegalArgumentException("Invalid Department Code: " + code);
+        throw new IllegalArgumentException("Invalid DepartmentRole Code: " + code);
     }
 
     public DepartmentInfo getInfo() {
