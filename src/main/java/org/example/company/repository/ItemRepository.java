@@ -1,7 +1,7 @@
 package org.example.company.repository;
 
 import java.util.Optional;
-import org.example.company.models.Item;
+import org.example.company.model.Item;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -15,7 +15,7 @@ A RESTful ordering system built with Spring Boot 4.0 and Java 25.
 ## Features
 
 - **Customer Management** - Create, read, update customers
-- **Employee Management** - CRUD operations with department support (code-based)
+- **Employee Management** - CRUD operations with departmentRole support (code-based)
 - **Item Catalog** - Product management with discount calculation
 - **Order Processing** - Create and manage orders with multiple items
 - **Order Delivery** - Mark orders as delivered
@@ -200,7 +200,7 @@ The application returns consistent error responses:
 
 | HTTP Status | Description |
 |-------------|-------------|
-| 400 | Validation error / Invalid argument (e.g., invalid department code) |
+| 400 | Validation error / Invalid argument (e.g., invalid departmentRole code) |
 | 403 | Forbidden - Access denied (missing or insufficient role) |
 | 404 | Resource not found |
 | 409 | Conflict (e.g., duplicate email) |

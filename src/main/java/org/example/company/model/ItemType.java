@@ -1,4 +1,4 @@
-package org.example.company.models;
+package org.example.company.model;
 
 public enum ItemType {
 

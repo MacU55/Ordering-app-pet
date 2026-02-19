@@ -8,9 +8,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.company.dto.request.RequestEmployee;
 import org.example.company.dto.response.ResponseEmployee;
-import org.example.company.models.Department;
-import org.example.company.models.Employee;
+import org.example.company.model.DepartmentRole;
+import org.example.company.model.Employee;
 import org.example.company.repository.EmployeeRepository;
+import org.example.company.service.converter.EmployeeConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,21 +21,22 @@ import org.springframework.transaction.annotation.Transactional;
 public class EmployeeService {
 
     private final EmployeeRepository employeeRepository;
+    private final EmployeeConverter employeeConverter;
 
     @Transactional(readOnly = true)
     public Optional<ResponseEmployee> findEmployeeByName(String name) {
-        return employeeRepository.findByName(name).map(ResponseEmployee::fromEmployee);
+        return employeeRepository.findByName(name).map(employeeConverter::convertToDTO);
     }
 
     @Transactional(readOnly = true)
     public Optional<ResponseEmployee> findEmployeeByEmail(String email) {
-        return employeeRepository.findByEmail(email).map(ResponseEmployee::fromEmployee);
+        return employeeRepository.findByEmail(email).map(employeeConverter::convertToDTO);
     }
 
     @Transactional(readOnly = true)
-    public List<ResponseEmployee> findEmployeesByDepartment(Department department) {
-        return employeeRepository.findByDepartment(department).stream()
-            .map(ResponseEmployee::fromEmployee)
+    public List<ResponseEmployee> findEmployeesByDepartment(DepartmentRole departmentRole) {
+        return employeeRepository.findByDepartment(departmentRole).stream()
+            .map(employeeConverter::convertToDTO)
             .collect(Collectors.toList());
     }
 
@@ -46,21 +48,21 @@ public class EmployeeService {
     @Transactional(readOnly = true)
     public Employee getEmployeeById(long id) {
         return employeeRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Employee with id " + id + " not found"));
+            .orElseThrow(() -> new EntityNotFoundException("Employee with uuid " + id + " not found"));
     }
 
     @Transactional
     public ResponseEmployee saveEmployee(RequestEmployee requestEmployee) {
-        Employee savedEmployee = employeeRepository.save(RequestEmployee.fromRequestEmployee(requestEmployee));
-        return ResponseEmployee.fromEmployee(savedEmployee);
+        Employee savedEmployee = employeeRepository.save(employeeConverter.convertToEntity(requestEmployee));
+        return employeeConverter.convertToDTO(savedEmployee);
     }
 
     @Transactional
     public ResponseEmployee updateEmployee(long employeeId, RequestEmployee requestEmployee) {
         Employee employee = employeeRepository.findById(employeeId)
-            .orElseThrow(() -> new EntityNotFoundException("Employee with id " + employeeId + " not found"));
+            .orElseThrow(() -> new EntityNotFoundException("Employee with uuid " + employeeId + " not found"));
         employee.updateEmployee(requestEmployee);
-        return ResponseEmployee.fromEmployee(employee);
+        return employeeConverter.convertToDTO(employee);
     }
 
     @Transactional
@@ -68,16 +70,16 @@ public class EmployeeService {
         if (employeeRepository.existsById(id)) {
             employeeRepository.deleteById(id);
         } else {
-            log.error("Employee with id {} not found", id);
-            throw new EntityNotFoundException("Employee with id " + id + " not found");
+            log.error("Employee with uuid {} not found", id);
+            throw new EntityNotFoundException("Employee with uuid " + id + " not found");
         }
     }
 
     @Transactional(readOnly = true)
-    public Department.DepartmentInfo getDepartmentInfoByEmployeeId(long employeeId) {
+    public DepartmentRole.DepartmentInfo getDepartmentInfoByEmployeeId(long employeeId) {
         Employee employee = employeeRepository.findById(employeeId)
-            .orElseThrow(() -> new EntityNotFoundException("Employee with id " + employeeId + " not found"));
-        Department department = employee.getDepartment();
-        return department.getInfo();
+            .orElseThrow(() -> new EntityNotFoundException("Employee with uuid " + employeeId + " not found"));
+        DepartmentRole departmentRole = employee.getDepartmentRole();
+        return departmentRole.getInfo();
     }
 }

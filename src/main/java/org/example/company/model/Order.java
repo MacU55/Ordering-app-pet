@@ -1,14 +1,13 @@
-package org.example.company.models;
+package org.example.company.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
@@ -20,6 +19,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+
 @Entity
 @Getter
 @Setter
@@ -27,13 +27,8 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "orders")
-public class Order {
+public class Order extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-
-    private LocalDateTime orderDateCreated;
     private LocalDateTime orderDateDelivered;
 
     @ManyToMany
@@ -49,19 +44,37 @@ public class Order {
         cascade = CascadeType.ALL,
         orphanRemoval = true
     )
-    private Set<OrderItem> orderItemSet = new HashSet<>();
+    private List<OrderItem> orderItemList = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
+//    long id,
+//    LocalDateTime orderDateCreated,
+//    LocalDateTime orderDateDelivered,
+//    List<ResponseOrderItem> items,
+//    long customerId
+
+    public Order(LocalDateTime orderDateCreated, List<OrderItem> orderItems, Customer customer) {
+        this.createdAt = orderDateCreated;
+        this.orderItemList = orderItems;
+        this.customer = customer;
+    }
+
+    public Order(List<OrderItem> orderItems, Customer customer) {
+        this.createdAt = LocalDateTime.now();
+        this.orderItemList = orderItems;
+        this.customer = customer;
+    }
+
     public void addOrderItem(Item item, int quantity, BigDecimal priceAtOrderTime) {
         OrderItem orderItem = new OrderItem(this, item, quantity, priceAtOrderTime);
-        orderItemSet.add(orderItem);
+        orderItemList.add(orderItem);
     }
 
     public void clearOrderItems() {
-        this.orderItemSet.clear();
+        this.orderItemList.clear();
     }
 
     @Override

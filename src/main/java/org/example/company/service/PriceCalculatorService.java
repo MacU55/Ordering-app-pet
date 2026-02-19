@@ -2,7 +2,7 @@ package org.example.company.service;
 
 import java.math.BigDecimal;
 import lombok.extern.slf4j.Slf4j;
-import org.example.company.models.ItemType;
+import org.example.company.model.ItemType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.stereotype.Service;

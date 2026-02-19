@@ -1,17 +1,11 @@
-package org.example.company.models;
+package org.example.company.model;
 
 import java.math.BigDecimal;
-import java.util.Set;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,11 +16,8 @@ import org.example.company.dto.request.RequestItem;
 @Setter
 @NoArgsConstructor
 @Table(name = "items")
-public class Item {
+public class Item extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
 
     @Column(nullable = false)
     private String name;
@@ -46,6 +37,15 @@ public class Item {
         this.price = requestItem.price();
         this.type = requestItem.itemType();
     }
+
+    public Item(String name, String description, BigDecimal price, ItemType type) {
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.type = type;
+    }
+
+
 
     public void updateItem(RequestItem requestItem){
         this.name = requestItem.name();

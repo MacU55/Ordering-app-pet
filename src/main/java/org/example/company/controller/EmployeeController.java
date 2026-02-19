@@ -6,9 +6,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.company.dto.request.RequestEmployee;
 import org.example.company.dto.response.ResponseEmployee;
-import org.example.company.models.Department;
-import org.example.company.models.Employee;
+import org.example.company.model.DepartmentRole;
+import org.example.company.model.Employee;
 import org.example.company.service.EmployeeService;
+import org.example.company.service.converter.EmployeeConverter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,6 +29,7 @@ import org.example.company.security.model.Roles;
 public class EmployeeController {
 
     private final EmployeeService employeeService;
+    private final EmployeeConverter employeeConverter;
 
     @GetMapping("/by-name")
     @IsAllowedByRole({Roles.EMPLOYEE_ADMINISTRATION})
@@ -47,27 +49,27 @@ public class EmployeeController {
 
     @GetMapping("/by-department")
     @IsAllowedByRole({Roles.EMPLOYEE_ADMINISTRATION})
-    public List<ResponseEmployee> getEmployeesByDepartment(@RequestParam Department department) {
-        return employeeService.findEmployeesByDepartment(department);
+    public List<ResponseEmployee> getEmployeesByDepartment(@RequestParam DepartmentRole departmentRole) {
+        return employeeService.findEmployeesByDepartment(departmentRole);
     }
 
     @GetMapping("/{id}")
     @IsAllowedByRole({Roles.EMPLOYEE_ADMINISTRATION})
     public ResponseEmployee getEmployeeById(@PathVariable long id) {
         Employee employee = employeeService.getEmployeeById(id);
-        return ResponseEmployee.fromEmployee(employee);
+        return employeeConverter.convertToDTO(employee);
     }
 
     @GetMapping
     @IsAllowedByRole({Roles.EMPLOYEE_ADMINISTRATION})
     public List<ResponseEmployee> getAllEmployees() {
         List<Employee> allEmployees = employeeService.getAllEmployees();
-        return allEmployees.stream().map(ResponseEmployee::fromEmployee).toList();
+        return allEmployees.stream().map(employeeConverter::convertToDTO).toList();
     }
 
     @GetMapping("/{id}/department")
     @IsAllowedByRole({Roles.EMPLOYEE_ADMINISTRATION})
-    public Department.DepartmentInfo getDepartmentInfo(@PathVariable long id) {
+    public DepartmentRole.DepartmentInfo getDepartmentInfo(@PathVariable long id) {
         return employeeService.getDepartmentInfoByEmployeeId(id);
     }
 
@@ -75,7 +77,7 @@ public class EmployeeController {
     @IsAllowedByRole({Roles.EMPLOYEE_ADMINISTRATION})
     public ResponseEntity<ResponseEmployee> createEmployee(@Valid @RequestBody RequestEmployee employee) {
         ResponseEmployee responseEmployee = employeeService.saveEmployee(employee);
-        URI location = URI.create("/employees/" + responseEmployee.id());
+        URI location = URI.create("/employees/" + responseEmployee.uuid());
         return ResponseEntity.created(location).body(responseEmployee);
     }
 
