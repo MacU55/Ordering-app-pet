@@ -2,6 +2,7 @@ package org.example.company.controller;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Set;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.company.dto.request.RequestEmployee;
@@ -69,7 +70,7 @@ public class EmployeeController {
 
     @GetMapping("/{id}/department")
     @IsAllowedByRole({Roles.EMPLOYEE_ADMINISTRATION})
-    public DepartmentRole.DepartmentInfo getDepartmentInfo(@PathVariable long id) {
+    public Set<DepartmentRole.DepartmentInfo> getDepartmentInfo(@PathVariable long id) {
         return employeeService.getDepartmentInfoByEmployeeId(id);
     }
 

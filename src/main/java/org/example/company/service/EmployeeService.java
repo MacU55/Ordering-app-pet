@@ -2,6 +2,7 @@ package org.example.company.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,7 @@ import org.example.company.dto.request.RequestEmployee;
 import org.example.company.dto.response.ResponseEmployee;
 import org.example.company.model.DepartmentRole;
 import org.example.company.model.Employee;
+import org.example.company.model.Role;
 import org.example.company.repository.EmployeeRepository;
 import org.example.company.service.utility.EmployeeEmailGenerator;
 import org.example.company.service.utility.converter.EmployeeConverter;
@@ -83,10 +85,11 @@ public class EmployeeService {
     }
 
     @Transactional(readOnly = true)
-    public DepartmentRole.DepartmentInfo getDepartmentInfoByEmployeeId(long employeeId) {
+    public Set<DepartmentRole.DepartmentInfo> getDepartmentInfoByEmployeeId(long employeeId) {
         Employee employee = employeeRepository.findById(employeeId)
             .orElseThrow(() -> new EntityNotFoundException("Employee with uuid " + employeeId + " not found"));
-        DepartmentRole departmentRole = employee.getDepartmentRole();
-        return departmentRole.getInfo();
+        Set<DepartmentRole> departmentRoles =
+            employee.getRoles().stream().map(Role::getDepartmentRole).collect(Collectors.toSet());
+        return departmentRoles.stream().map(DepartmentRole::getInfo).collect(Collectors.toSet());
     }
 }

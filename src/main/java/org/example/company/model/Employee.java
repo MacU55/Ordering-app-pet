@@ -38,15 +38,9 @@ public class Employee extends BaseEntity {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Enumerated(EnumType.STRING)
-    private DepartmentRole departmentRole;
+//    @Enumerated(EnumType.STRING)
+//    private DepartmentRole departmentRole;
 
-    public Employee(String name, UUID uuid, double salary, String email) {
-        this.name = name;
-        this.uuid = uuid;
-        this.salary = salary;
-        this.email = email;
-    }
 
     public Employee(String name, double salary) {
         this.name = name;
@@ -62,7 +56,6 @@ public class Employee extends BaseEntity {
     public void updateEmployee(RequestEmployee r) {
         if(r.name() != null) this.name = r.name();
         if(r.salary() != null) this.salary = r.salary();
-//        if(r.department() != null) this.d
     }
 
     @PrePersist
