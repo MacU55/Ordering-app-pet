@@ -9,7 +9,7 @@ import org.example.company.dto.response.ResponseEmployee;
 import org.example.company.model.DepartmentRole;
 import org.example.company.model.Employee;
 import org.example.company.service.EmployeeService;
-import org.example.company.service.converter.EmployeeConverter;
+import org.example.company.service.utility.converter.EmployeeConverter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;

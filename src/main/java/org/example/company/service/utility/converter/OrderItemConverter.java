@@ -1,4 +1,4 @@
-package org.example.company.service.converter;
+package org.example.company.service.utility.converter;
 
 import org.example.company.dto.request.RequestOrderItem;
 import org.example.company.dto.response.ResponseOrderItem;
@@ -6,7 +6,7 @@ import org.example.company.model.OrderItem;
 import org.springframework.stereotype.Component;
 
 @Component
-public class OrderItemConverter extends ConverterImpl<OrderItem, ResponseOrderItem, RequestOrderItem>{
+public class OrderItemConverter extends ConverterImpl<OrderItem, ResponseOrderItem, RequestOrderItem> {
 
     @Override
     public ResponseOrderItem convertToDTO(OrderItem orderItem) {

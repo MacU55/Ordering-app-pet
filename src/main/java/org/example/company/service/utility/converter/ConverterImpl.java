@@ -1,4 +1,4 @@
-package org.example.company.service.converter;
+package org.example.company.service.utility.converter;
 
 public abstract class ConverterImpl<A, B, C> implements Converter<A, B, C> {
 

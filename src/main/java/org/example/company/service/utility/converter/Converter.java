@@ -1,4 +1,4 @@
-package org.example.company.service.converter;
+package org.example.company.service.utility.converter;
 
 public interface Converter<A, B, C> {
 

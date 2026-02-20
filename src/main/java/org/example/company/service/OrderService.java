@@ -14,7 +14,7 @@ import org.example.company.repository.CustomerRepository;
 import org.example.company.repository.EmployeeRepository;
 import org.example.company.repository.ItemRepository;
 import org.example.company.repository.OrderRepository;
-import org.example.company.service.converter.OrderConverter;
+import org.example.company.service.utility.converter.OrderConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

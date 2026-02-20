@@ -11,7 +11,7 @@ import org.example.company.exception.BaseException;
 import org.example.company.exception.EmailAlreadyExistsException;
 import org.example.company.model.Customer;
 import org.example.company.repository.CustomerRepository;
-import org.example.company.service.converter.CustomerConverter;
+import org.example.company.service.utility.converter.CustomerConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

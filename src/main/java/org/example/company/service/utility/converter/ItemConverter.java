@@ -1,4 +1,4 @@
-package org.example.company.service.converter;
+package org.example.company.service.utility.converter;
 
 import org.example.company.dto.request.RequestItem;
 import org.example.company.dto.response.ResponseItem;

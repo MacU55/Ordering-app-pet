@@ -11,7 +11,8 @@ import org.example.company.dto.response.ResponseEmployee;
 import org.example.company.model.DepartmentRole;
 import org.example.company.model.Employee;
 import org.example.company.repository.EmployeeRepository;
-import org.example.company.service.converter.EmployeeConverter;
+import org.example.company.service.utility.EmployeeEmailGenerator;
+import org.example.company.service.utility.converter.EmployeeConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,8 +54,14 @@ public class EmployeeService {
 
     @Transactional
     public ResponseEmployee saveEmployee(RequestEmployee requestEmployee) {
-        Employee savedEmployee = employeeRepository.save(employeeConverter.convertToEntity(requestEmployee));
-        return employeeConverter.convertToDTO(savedEmployee);
+        Employee employee = employeeConverter.convertToEntity(requestEmployee);
+        String baseName = EmployeeEmailGenerator.normalizeNameForEmail(employee.getName());
+        String pattern = baseName + "%@ordering.com";
+        var existingEmails = employeeRepository.findEmailsByPattern(pattern);
+        String email = EmployeeEmailGenerator.generateNextAvailableEmail(baseName, existingEmails);
+        employee.setEmail(email);
+        employee = employeeRepository.save(employee);
+        return employeeConverter.convertToDTO(employee);
     }
 
     @Transactional
