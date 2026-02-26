@@ -1,17 +1,17 @@
 package org.example.company.exception;
 
 import java.util.Arrays;
-import org.example.company.security.model.Roles;
+import org.example.company.security.model.RoleTypes;
 
 /**
  * Exception thrown when user's role doesn't have access to the requested operation.
  */
 public class ImpropriateRoleException extends BaseException {
 
-    private final Roles currentRole;
-    private final Roles[] requiredRoles;
+    private final RoleTypes currentRole;
+    private final RoleTypes[] requiredRoles;
 
-    public ImpropriateRoleException(Roles currentRole, Roles[] requiredRoles) {
+    public ImpropriateRoleException(RoleTypes currentRole, RoleTypes[] requiredRoles) {
         super(ImpropriateRoleException.class,
             buildMessage(currentRole, requiredRoles));
         this.currentRole = currentRole;
@@ -24,7 +24,7 @@ public class ImpropriateRoleException extends BaseException {
         this.requiredRoles = null;
     }
 
-    private static String buildMessage(Roles currentRole, Roles[] requiredRoles) {
+    private static String buildMessage(RoleTypes currentRole, RoleTypes[] requiredRoles) {
         if (currentRole == null) {
             return String.format("No role provided. Required roles: %s", Arrays.toString(requiredRoles));
         }
@@ -37,11 +37,11 @@ public class ImpropriateRoleException extends BaseException {
         return ErrorType.ACCESS_DENIED;
     }
 
-    public Roles getCurrentRole() {
+    public RoleTypes getCurrentRole() {
         return currentRole;
     }
 
-    public Roles[] getRequiredRoles() {
+    public RoleTypes[] getRequiredRoles() {
         return requiredRoles;
     }
 }

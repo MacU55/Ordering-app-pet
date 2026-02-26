@@ -18,25 +18,30 @@ Base URL: `http://localhost:8080`
 
 ## Authentication
 
-This API uses role-based access control via HTTP header. All protected endpoints require the `X-User-Role` header.
+This API uses role-based access control. User identity and roles are determined by the `X-User-Email` header. The backend looks up the user by email in the database and assigns roles accordingly.
 
-### X-User-Role Header
+### X-User-Email Header
 
-Include this header in every request to specify your role:
+Include this header in every request with the user's email address. The system determines whether the email belongs to an **employee** (domain `@ordering.com`) or a **customer** (any other domain), then loads roles from the database.
 
 ```
-X-User-Role: EMPLOYEE_STORE
+X-User-Email: bob@ordering.com
+```
+
+For customers:
+```
+X-User-Email: john@example.com
 ```
 
 ### Available Roles
 
-| Role | Description | Access |
-|------|-------------|--------|
-| `CUSTOMER` | Customer/Client | Create orders, view items, manage own profile |
-| `EMPLOYEE_STORE` | Store employee | Full order management, delivery, customer service |
-| `EMPLOYEE_LAB` | Lab employee | Item catalog management (CRUD) |
-| `EMPLOYEE_ADMINISTRATION` | Admin employee | Employee management, order assignment |
-| `EMPLOYEE_ACCOUNTING` | Accounting employee | View orders, update item prices |
+| Role | Description | Who gets it |
+|------|-------------|-------------|
+| `CUSTOMER` | Customer/Client | Users found in `customers` table |
+| `EMPLOYEE_STORE` | Store employee | Employees with Store role |
+| `EMPLOYEE_LAB` | Lab employee | Employees with Lab role |
+| `EMPLOYEE_ADMIN` | Admin employee | Employees with Admin role |
+| `EMPLOYEE_ACCOUNTING` | Accounting employee | Employees with Accounting role |
 
 ### Role Permissions Matrix
 
@@ -44,52 +49,67 @@ X-User-Role: EMPLOYEE_STORE
 |----------|----------|-------|-----|-------|------------|
 | **Orders** |
 | GET /orders | - | ✓ | - | ✓ | ✓ |
-| GET /orders/{id} | ✓ | ✓ | - | ✓ | ✓ |
+| GET /orders/{id} | - | ✓ | - | ✓ | ✓ |
+| GET /orders/undelivered | - | ✓ | - | ✓ | - |
+| GET /orders/created-after | - | ✓ | - | ✓ | ✓ |
+| GET /orders/created-between | - | ✓ | - | ✓ | ✓ |
 | POST /orders | ✓ | ✓ | - | - | - |
 | PUT /orders/{id} | - | ✓ | - | - | - |
 | DELETE /orders/{id} | - | ✓ | - | ✓ | - |
 | POST /orders/{id}/deliver | - | ✓ | - | - | - |
 | PATCH /orders/{id}/employee/{empId} | - | - | - | ✓ | - |
+| DELETE /orders/{id}/employee/{empId} | - | - | - | ✓ | - |
 | **Items** |
 | GET /items | ✓ | ✓ | ✓ | - | ✓ |
 | GET /items/{id} | ✓ | ✓ | ✓ | - | ✓ |
+| GET /items/by-name | ✓ | ✓ | ✓ | - | - |
+| GET /items/id-exists | - | ✓ | ✓ | - | - |
+| GET /items/{id}/discount-price | - | ✓ | ✓ | - | ✓ |
 | POST /items | - | - | ✓ | - | - |
 | PUT /items/{id} | - | - | ✓ | - | ✓ |
 | DELETE /items/{id} | - | - | ✓ | - | - |
 | **Employees** |
 | GET /employees | - | - | - | ✓ | - |
+| GET /employees/{id} | - | - | - | ✓ | - |
+| GET /employees/by-name | - | - | - | ✓ | - |
+| GET /employees/by-email | - | - | - | ✓ | - |
 | POST /employees | - | - | - | ✓ | - |
 | PUT /employees/{id} | - | - | - | ✓ | - |
 | DELETE /employees/{id} | - | - | - | ✓ | - |
 | **Customers** |
 | GET /customers | - | ✓ | - | ✓ | - |
 | GET /customers/{id} | ✓ | ✓ | - | ✓ | - |
+| GET /customers/by-email | - | ✓ | - | ✓ | - |
+| GET /customers/by-username | - | ✓ | - | ✓ | - |
+| GET /customers/email-exists | ✓ | ✓ | - | ✓ | ✓ |
 | POST /customers | ✓ | ✓ | - | - | - |
 | PUT /customers/{id} | ✓ | ✓ | - | ✓ | - |
+| **Order Items** |
+| All /order-items endpoints | - | - | - | - | ✓ |
 
-### Example Requests with Role Header
+### Example Requests with Email Header
 
 **Bash/curl:**
 ```bash
 curl -X GET http://localhost:8080/orders \
-  -H "X-User-Role: EMPLOYEE_STORE"
+  -H "X-User-Email: alice@ordering.com"
 ```
 
 **PowerShell:**
 ```powershell
 Invoke-RestMethod -Uri "http://localhost:8080/orders" `
   -Method GET `
-  -Headers @{"X-User-Role" = "EMPLOYEE_STORE"}
+  -Headers @{"X-User-Email" = "alice@ordering.com"}
 ```
 
 ### Error Response (403 Forbidden)
 
-If role is missing or insufficient:
+If the email is missing, not found, or the user's roles are insufficient:
 
 ```json
 {
   "errorCode": "ACCESS_DENIED",
-  "errorMessage": "AccessDeniedException : Role CUSTOMER is not allowed. Required roles: [EMPLOYEE_ADMINISTRATION]"
+  "errorMessage": "Access Denied"
 }
 ```
 
@@ -101,35 +121,35 @@ If role is missing or insufficient:
 
 ```bash
 curl -X GET http://localhost:8080/customers \
-  -H "X-User-Role: EMPLOYEE_STORE"
+  -H "X-User-Email: alice@ordering.com"
 ```
 
 ### Get Customer by ID
 
 ```bash
 curl -X GET http://localhost:8080/customers/1 \
-  -H "X-User-Role: EMPLOYEE_STORE"
+  -H "X-User-Email: alice@ordering.com"
 ```
 
 ### Get Customer by Email
 
 ```bash
 curl -X GET "http://localhost:8080/customers/by-email?email=john@example.com" \
-  -H "X-User-Role: EMPLOYEE_STORE"
+  -H "X-User-Email: alice@ordering.com"
 ```
 
 ### Get Customer by Username
 
 ```bash
 curl -X GET "http://localhost:8080/customers/by-username?userName=johndoe" \
-  -H "X-User-Role: EMPLOYEE_STORE"
+  -H "X-User-Email: alice@ordering.com"
 ```
 
 ### Check if Email Exists
 
 ```bash
 curl -X GET "http://localhost:8080/customers/email-exists?email=john@example.com" \
-  -H "X-User-Role: CUSTOMER"
+  -H "X-User-Email: john@example.com"
 ```
 
 **Response:**
@@ -142,7 +162,7 @@ curl -X GET "http://localhost:8080/customers/email-exists?email=john@example.com
 ```bash
 curl -X POST http://localhost:8080/customers \
   -H "Content-Type: application/json" \
-  -H "X-User-Role: CUSTOMER" \
+  -H "X-User-Email: john@example.com" \
   -d '{
     "firstName": "Bob",
     "lastName": "Boot",
@@ -156,7 +176,7 @@ curl -X POST http://localhost:8080/customers \
 ```bash
 curl -X PUT http://localhost:8080/customers/1 \
   -H "Content-Type: application/json" \
-  -H "X-User-Role: EMPLOYEE_STORE" \
+  -H "X-User-Email: alice@ordering.com" \
   -d '{
     "firstName": "John",
     "lastName": "Smith",
@@ -169,95 +189,59 @@ curl -X PUT http://localhost:8080/customers/1 \
 
 ## Employees
 
+Employee endpoints require `EMPLOYEE_ADMIN` role. Use an admin employee's email (e.g. `alice@ordering.com`).
+
 ### Get All Employees
 
 ```bash
 curl -X GET http://localhost:8080/employees \
-  -H "X-User-Role: EMPLOYEE_ADMINISTRATION"
+  -H "X-User-Email: alice@ordering.com"
 ```
 
 ### Get Employee by ID
 
 ```bash
 curl -X GET http://localhost:8080/employees/1 \
-  -H "X-User-Role: EMPLOYEE_ADMINISTRATION"
+  -H "X-User-Email: alice@ordering.com"
 ```
 
 ### Get Employee by Name
 
 ```bash
 curl -X GET "http://localhost:8080/employees/by-name?name=Alice" \
-  -H "X-User-Role: EMPLOYEE_ADMINISTRATION"
+  -H "X-User-Email: alice@ordering.com"
 ```
 
 ### Get Employee by Email
 
 ```bash
-curl -X GET "http://localhost:8080/employees/by-email?email=alice@company.com" \
-  -H "X-User-Role: EMPLOYEE_ADMINISTRATION"
-```
-
-### Get Employees by Department
-
-Available departments: `STORE`, `LAB`, `ACCOUNTING`, `ADMINISTRATION`
-
-```bash
-curl -X GET "http://localhost:8080/employees/by-departmentRole?departmentRole=STORE" \
-  -H "X-User-Role: EMPLOYEE_ADMINISTRATION"
-```
-
-### Get Department Info by Employee ID
-
-```bash
-curl -X GET http://localhost:8080/employees/1/departmentRole \
-  -H "X-User-Role: EMPLOYEE_ADMINISTRATION"
-```
-
-**Response:**
-```json
-{
-  "displayName": "Store",
-  "code": 1,
-  "description": "Sales floor and warehouse"
-}
+curl -X GET "http://localhost:8080/employees/by-email?email=alice@ordering.com" \
+  -H "X-User-Email: alice@ordering.com"
 ```
 
 ### Create Employee
 
-Use departmentRole code (integer) instead of enum name:
-
-| Code | Department       | Description              |
-|------|------------------|--------------------------|
-| 1    | STORE            | Sales floor and warehouse |
-| 2    | LAB              | Research and testing     |
-| 3    | ACCOUNTING       | Finance and accounting   |
-| 4    | ADMINISTRATION   | Management and HR        |
+Email is auto-generated from the employee name (e.g. `Alice Johnson` → `AliceJohnson@ordering.com`). If the base email exists, a numeric suffix is added (`AliceJohnson2@ordering.com`).
 
 ```bash
 curl -X POST http://localhost:8080/employees \
   -H "Content-Type: application/json" \
-  -H "X-User-Role: EMPLOYEE_ADMINISTRATION" \
+  -H "X-User-Email: alice@ordering.com" \
   -d '{
     "name": "Alice Johnson",
-    "salary": 55000.00,
-    "email": "alice@company.com",
-    "department": 1
+    "salary": 55000.00
   }'
 ```
-
-> **Note:** Invalid departmentRole code returns `400 Bad Request` with error message.
 
 ### Update Employee
 
 ```bash
 curl -X PUT http://localhost:8080/employees/1 \
   -H "Content-Type: application/json" \
-  -H "X-User-Role: EMPLOYEE_ADMINISTRATION" \
+  -H "X-User-Email: alice@ordering.com" \
   -d '{
     "name": "Alice Johnson",
-    "salary": 60000.00,
-    "email": "alice.johnson@company.com",
-    "departmentRole": 4
+    "salary": 60000.00
   }'
 ```
 
@@ -265,7 +249,7 @@ curl -X PUT http://localhost:8080/employees/1 \
 
 ```bash
 curl -X DELETE http://localhost:8080/employees/1 \
-  -H "X-User-Role: EMPLOYEE_ADMINISTRATION"
+  -H "X-User-Email: alice@ordering.com"
 ```
 
 ---
@@ -276,28 +260,28 @@ curl -X DELETE http://localhost:8080/employees/1 \
 
 ```bash
 curl -X GET http://localhost:8080/items \
-  -H "X-User-Role: EMPLOYEE_LAB"
+  -H "X-User-Email: lab@ordering.com"
 ```
 
 ### Get Item by ID
 
 ```bash
 curl -X GET http://localhost:8080/items/1 \
-  -H "X-User-Role: EMPLOYEE_LAB"
+  -H "X-User-Email: lab@ordering.com"
 ```
 
 ### Get Item by Name
 
 ```bash
 curl -X GET "http://localhost:8080/items/by-name?name=Laptop" \
-  -H "X-User-Role: EMPLOYEE_LAB"
+  -H "X-User-Email: lab@ordering.com"
 ```
 
 ### Check if Item ID Exists
 
 ```bash
 curl -X GET "http://localhost:8080/items/id-exists?id=1" \
-  -H "X-User-Role: EMPLOYEE_LAB"
+  -H "X-User-Email: lab@ordering.com"
 ```
 
 **Response:**
@@ -309,7 +293,7 @@ curl -X GET "http://localhost:8080/items/id-exists?id=1" \
 
 ```bash
 curl -X GET http://localhost:8080/items/1/discount-price \
-  -H "X-User-Role: EMPLOYEE_LAB"
+  -H "X-User-Email: lab@ordering.com"
 ```
 
 ### Create Item
@@ -326,7 +310,7 @@ Available item types:
 ```bash
 curl -X POST http://localhost:8080/items \
   -H "Content-Type: application/json" \
-  -H "X-User-Role: EMPLOYEE_LAB" \
+  -H "X-User-Email: lab@ordering.com" \
   -d '{
     "name": "Laptop",
     "description": "High-performance laptop",
@@ -340,7 +324,7 @@ curl -X POST http://localhost:8080/items \
 ```bash
 curl -X PUT http://localhost:8080/items/1 \
   -H "Content-Type: application/json" \
-  -H "X-User-Role: EMPLOYEE_LAB" \
+  -H "X-User-Email: lab@ordering.com" \
   -d '{
     "name": "Laptop Pro",
     "description": "Premium high-performance laptop",
@@ -349,24 +333,11 @@ curl -X PUT http://localhost:8080/items/1 \
   }'
 ```
 
-```bash
-curl -X POST http://localhost:8080/items \
-  -H "Content-Type: application/json" \
-  -H "X-User-Role: EMPLOYEE_LAB" \
-  -d '{
-    "name": "Spagetti",
-    "description": "delicious food",
-    "price": 10.28,
-    "itemType": "FOOD"
-  }'
-```
-
-
 ### Delete Item
 
 ```bash
 curl -X DELETE http://localhost:8080/items/1 \
-  -H "X-User-Role: EMPLOYEE_LAB"
+  -H "X-User-Email: lab@ordering.com"
 ```
 
 ---
@@ -377,21 +348,21 @@ curl -X DELETE http://localhost:8080/items/1 \
 
 ```bash
 curl -X GET http://localhost:8080/orders \
-  -H "X-User-Role: EMPLOYEE_STORE"
+  -H "X-User-Email: store@ordering.com"
 ```
 
 ### Get Order by ID
 
 ```bash
 curl -X GET http://localhost:8080/orders/1 \
-  -H "X-User-Role: EMPLOYEE_STORE"
+  -H "X-User-Email: store@ordering.com"
 ```
 
 ### Get Undelivered Orders
 
 ```bash
 curl -X GET http://localhost:8080/orders/undelivered \
-  -H "X-User-Role: EMPLOYEE_STORE"
+  -H "X-User-Email: store@ordering.com"
 ```
 
 ### Get Orders Created After Date
@@ -400,14 +371,14 @@ Date format: ISO 8601 (`yyyy-MM-ddTHH:mm:ss`)
 
 ```bash
 curl -X GET "http://localhost:8080/orders/created-after?date=2026-01-01T00:00:00" \
-  -H "X-User-Role: EMPLOYEE_STORE"
+  -H "X-User-Email: store@ordering.com"
 ```
 
 ### Get Orders Created Between Dates
 
 ```bash
 curl -X GET "http://localhost:8080/orders/created-between?start=2026-01-01T00:00:00&end=2026-12-31T23:59:59" \
-  -H "X-User-Role: EMPLOYEE_STORE"
+  -H "X-User-Email: store@ordering.com"
 ```
 
 ### Create Order
@@ -415,7 +386,7 @@ curl -X GET "http://localhost:8080/orders/created-between?start=2026-01-01T00:00
 ```bash
 curl -X POST http://localhost:8080/orders \
   -H "Content-Type: application/json" \
-  -H "X-User-Role: EMPLOYEE_STORE" \
+  -H "X-User-Email: store@ordering.com" \
   -d '{
     "items": [
       {
@@ -432,12 +403,13 @@ curl -X POST http://localhost:8080/orders \
     "customerId" : 1
   }'
 ```
+
 ### Creating Order without price
 
 ```bash
 curl -X POST http://localhost:8080/orders \
   -H "Content-Type: application/json" \
-  -H "X-User-Role: CUSTOMER" \
+  -H "X-User-Email: john@example.com" \
   -d '{
     "items": [
       {
@@ -452,12 +424,13 @@ curl -X POST http://localhost:8080/orders \
     "customerId" : 1
   }'
 ```
+
 ### Update Order
 
 ```bash
 curl -X PUT http://localhost:8080/orders/1 \
   -H "Content-Type: application/json" \
-  -H "X-User-Role: EMPLOYEE_STORE" \
+  -H "X-User-Email: store@ordering.com" \
   -d '{
     "items": [
       {
@@ -473,7 +446,7 @@ curl -X PUT http://localhost:8080/orders/1 \
 
 ```bash
 curl -X DELETE http://localhost:8080/orders/1 \
-  -H "X-User-Role: EMPLOYEE_STORE"
+  -H "X-User-Email: store@ordering.com"
 ```
 
 ### Deliver Order
@@ -482,29 +455,29 @@ Mark an order as delivered (sets `orderDateDelivered` to current timestamp).
 
 ```bash
 curl -X POST http://localhost:8080/orders/1/deliver \
-  -H "X-User-Role: EMPLOYEE_STORE"
+  -H "X-User-Email: store@ordering.com"
 ```
 
 **Response:** `204 No Content` on success.
 
 ### Assign Employee to Order
 
-Add an employee to work on an order. One order can have multiple employees.
+Add an employee to work on an order. One order can have multiple employees. Requires `EMPLOYEE_ADMIN` role.
 
 ```bash
 curl -X PATCH http://localhost:8080/orders/1/employee/5 \
-  -H "X-User-Role: EMPLOYEE_ADMINISTRATION"
+  -H "X-User-Email: alice@ordering.com"
 ```
 
 **Response:** `204 No Content` on success.
 
 ### Remove Employee from Order
 
-Remove an employee from an order.
+Remove an employee from an order. Requires `EMPLOYEE_ADMIN` role.
 
 ```bash
 curl -X DELETE http://localhost:8080/orders/1/employee/5 \
-  -H "X-User-Role: EMPLOYEE_ADMINISTRATION"
+  -H "X-User-Email: alice@ordering.com"
 ```
 
 **Response:** `204 No Content` on success.
@@ -513,28 +486,34 @@ curl -X DELETE http://localhost:8080/orders/1/employee/5 \
 
 ## Order Items
 
+Order Items endpoints require `EMPLOYEE_ACCOUNTING` role.
+
 ### Get All Order Items
 
 ```bash
-curl -X GET http://localhost:8080/order-items
+curl -X GET http://localhost:8080/order-items \
+  -H "X-User-Email: accounting@ordering.com"
 ```
 
 ### Get Order Item by ID
 
 ```bash
-curl -X GET http://localhost:8080/order-items/1
+curl -X GET http://localhost:8080/order-items/1 \
+  -H "X-User-Email: accounting@ordering.com"
 ```
 
 ### Get Order Items by Order ID
 
 ```bash
-curl -X GET http://localhost:8080/order-items/order/1
+curl -X GET http://localhost:8080/order-items/order/1 \
+  -H "X-User-Email: accounting@ordering.com"
 ```
 
 ### Check if Order Item Exists
 
 ```bash
-curl -X GET "http://localhost:8080/order-items/exists?orderId=1&itemId=1"
+curl -X GET "http://localhost:8080/order-items/exists?orderId=1&itemId=1" \
+  -H "X-User-Email: accounting@ordering.com"
 ```
 
 **Response:**
@@ -547,6 +526,7 @@ curl -X GET "http://localhost:8080/order-items/exists?orderId=1&itemId=1"
 ```bash
 curl -X POST http://localhost:8080/order-items \
   -H "Content-Type: application/json" \
+  -H "X-User-Email: accounting@ordering.com" \
   -d '{
     "orderId": 1,
     "itemId": 2,
@@ -560,6 +540,7 @@ curl -X POST http://localhost:8080/order-items \
 ```bash
 curl -X PUT http://localhost:8080/order-items/1 \
   -H "Content-Type: application/json" \
+  -H "X-User-Email: accounting@ordering.com" \
   -d '{
     "quantity": 5,
     "price": 17.99
@@ -569,7 +550,8 @@ curl -X PUT http://localhost:8080/order-items/1 \
 ### Delete Order Item
 
 ```bash
-curl -X DELETE http://localhost:8080/order-items/1
+curl -X DELETE http://localhost:8080/order-items/1 \
+  -H "X-User-Email: accounting@ordering.com"
 ```
 
 ---
@@ -602,7 +584,7 @@ The API returns standard HTTP status codes:
 | 201  | Created - Resource created successfully |
 | 204  | No Content - Resource deleted successfully |
 | 400  | Bad Request - Validation error or invalid argument |
-| 403  | Forbidden - Access denied (missing or insufficient role) |
+| 403  | Forbidden - Access denied (missing header, unknown email, or insufficient role) |
 | 404  | Not Found - Resource not found |
 | 409  | Conflict - Duplicate entry (e.g., email already exists) |
 | 500  | Internal Server Error |
@@ -637,31 +619,31 @@ The API returns standard HTTP status codes:
 
 ## Quick Test Script
 
-Run all basic GET endpoints (using EMPLOYEE_ADMINISTRATION role for full access):
+Run all basic GET endpoints. Use an admin employee email for employees/customers, store for orders, lab for items, accounting for order-items:
 
 ```bash
 #!/bin/bash
 BASE_URL="http://localhost:8080"
-ROLE="X-User-Role: EMPLOYEE_ADMINISTRATION"
+ADMIN_EMAIL="alice@ordering.com"
 
 echo "=== Testing Customers ==="
-curl -s -H "$ROLE" $BASE_URL/customers | head -c 200
+curl -s -H "X-User-Email: $ADMIN_EMAIL" $BASE_URL/customers | head -c 200
 echo -e "\n"
 
 echo "=== Testing Employees ==="
-curl -s -H "$ROLE" $BASE_URL/employees | head -c 200
+curl -s -H "X-User-Email: $ADMIN_EMAIL" $BASE_URL/employees | head -c 200
 echo -e "\n"
 
-echo "=== Testing Items (as LAB) ==="
-curl -s -H "X-User-Role: EMPLOYEE_LAB" $BASE_URL/items | head -c 200
+echo "=== Testing Items ==="
+curl -s -H "X-User-Email: lab@ordering.com" $BASE_URL/items | head -c 200
 echo -e "\n"
 
-echo "=== Testing Orders (as STORE) ==="
-curl -s -H "X-User-Role: EMPLOYEE_STORE" $BASE_URL/orders | head -c 200
+echo "=== Testing Orders ==="
+curl -s -H "X-User-Email: store@ordering.com" $BASE_URL/orders | head -c 200
 echo -e "\n"
 
 echo "=== Testing Order Items ==="
-curl -s $BASE_URL/order-items | head -c 200
+curl -s -H "X-User-Email: accounting@ordering.com" $BASE_URL/order-items | head -c 200
 echo -e "\n"
 
 echo "=== All tests completed ==="
@@ -678,7 +660,7 @@ If using PowerShell instead of bash:
 ```powershell
 Invoke-RestMethod -Uri "http://localhost:8080/customers" `
   -Method GET `
-  -Headers @{"X-User-Role" = "EMPLOYEE_STORE"}
+  -Headers @{"X-User-Email" = "alice@ordering.com"}
 ```
 
 ### POST Request
@@ -695,7 +677,7 @@ Invoke-RestMethod -Uri "http://localhost:8080/customers" `
   -Method POST `
   -Body $body `
   -ContentType "application/json" `
-  -Headers @{"X-User-Role" = "EMPLOYEE_STORE"}
+  -Headers @{"X-User-Email" = "alice@ordering.com"}
 ```
 
 ### DELETE Request
@@ -703,5 +685,5 @@ Invoke-RestMethod -Uri "http://localhost:8080/customers" `
 ```powershell
 Invoke-RestMethod -Uri "http://localhost:8080/employees/1" `
   -Method DELETE `
-  -Headers @{"X-User-Role" = "EMPLOYEE_ADMINISTRATION"}
+  -Headers @{"X-User-Email" = "alice@ordering.com"}
 ```

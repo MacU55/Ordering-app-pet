@@ -16,8 +16,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 /**
  * Minimal Spring Security configuration.
- * Authentication is handled via X-User-Role header (for development/testing).
- * Authorization is handled via @IsAllowedByRole annotation and RoleAspect.
+ * Authorization is handled via RoleFilter and @PreAuthorize annotation.
  */
 @Configuration
 @EnableWebSecurity
@@ -34,12 +33,13 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) {
         return http
             .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> 
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 .anyRequest().permitAll()
             )
             .addFilterBefore(roleFilter, UsernamePasswordAuthenticationFilter.class)

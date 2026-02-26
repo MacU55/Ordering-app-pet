@@ -58,13 +58,13 @@ public class OrderService {
 
     @Transactional(readOnly = true)
     public List<ResponseOrder> findCreatedAfter(LocalDateTime date) {
-        List<Order> orderList = orderRepository.findByOrderDateCreatedAfter(date);
+        List<Order> orderList = orderRepository.findByCreatedAtAfter(date);
         return orderList.stream().map(orderConverter::convertToDTO).collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public List<ResponseOrder> findCreatedBetween(LocalDateTime start, LocalDateTime end) {
-        List<Order> orderList = orderRepository.findByOrderDateCreatedBetween(start, end);
+        List<Order> orderList = orderRepository.findByCreatedAtBetween(start, end);
         return orderList.stream().map(orderConverter::convertToDTO).collect(Collectors.toList());
     }
 

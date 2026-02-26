@@ -6,8 +6,6 @@ import java.util.Set;
 import java.util.UUID;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
@@ -30,7 +28,7 @@ public class Employee extends BaseEntity {
     private UUID uuid;
 
     @Column(nullable = false)
-    private String name;
+    private String userName;
 
     @Column(nullable = false)
     private Double salary;
@@ -39,36 +37,25 @@ public class Employee extends BaseEntity {
     private String email;
 
 //    @Enumerated(EnumType.STRING)
-//    private DepartmentRole departmentRole;
+//    private RoleTypes departmentRole;
 
 
-    public Employee(String name, double salary) {
-        this.name = name;
+    public Employee(String userName, double salary) {
+        this.userName = userName;
         this.salary = salary;
+        this.uuid = UUID.randomUUID();
     }
 
     @ManyToMany(mappedBy = "employees")
     private Set<Order> orders = new HashSet<>();
 
     @ManyToMany(mappedBy = "employees")
-    private Set<Role> roles = new HashSet<>();
+    private Set<Role> roleEntities = new HashSet<>();
 
     public void updateEmployee(RequestEmployee r) {
-        if(r.name() != null) this.name = r.name();
+        if(r.name() != null) this.userName = r.name();
         if(r.salary() != null) this.salary = r.salary();
     }
-
-    @PrePersist
-    public void setUUID(){
-        if(this.uuid == null) this.uuid = UUID.randomUUID();
-        this.createdAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    public void setUpdatedAt(){
-        this.updatedAt = LocalDateTime.now();
-    }
-
 
     @Override
     public boolean equals(Object o) {

@@ -10,6 +10,7 @@ import org.example.company.dto.request.RequestItem;
 import org.example.company.dto.response.ResponseItem;
 import org.example.company.service.ItemService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,8 +20,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.example.company.security.annotation.IsAllowedByRole;
-import org.example.company.security.model.Roles;
 
 @RestController
 @RequestMapping("/items")
@@ -30,7 +29,10 @@ public class ItemController {
     private final ItemService itemService;
 
     @GetMapping("/by-name")
-    @IsAllowedByRole({Roles.EMPLOYEE_LAB, Roles.EMPLOYEE_STORE, Roles.CUSTOMER})
+    @PreAuthorize("hasAnyRole(" +
+        "T(org.example.company.security.model.RoleTypes).EMPLOYEE_LAB.name()," +
+        "T(org.example.company.security.model.RoleTypes).EMPLOYEE_STORE.name()," +
+        "T(org.example.company.security.model.RoleTypes).CUSTOMER.name())")
     public ResponseEntity<ResponseItem> getItemByName(@RequestParam String name) {
         return itemService.findItemByName(name)
             .map(ResponseEntity::ok)
@@ -38,31 +40,43 @@ public class ItemController {
     }
 
     @GetMapping("/id-exists")
-    @IsAllowedByRole({Roles.EMPLOYEE_LAB, Roles.EMPLOYEE_STORE})
+    @PreAuthorize("hasAnyRole(T(org.example.company.security.model.RoleTypes).EMPLOYEE_LAB.name()," +
+        "T(org.example.company.security.model.RoleTypes).EMPLOYEE_STORE.name())")
     public Map<String, Boolean> checkIdExists(@RequestParam long id) {
         return Map.of("exists", itemService.existsById(id));
     }
 
     @GetMapping
-    @IsAllowedByRole({Roles.EMPLOYEE_LAB, Roles.EMPLOYEE_STORE, Roles.EMPLOYEE_ACCOUNTING, Roles.CUSTOMER})
+    @PreAuthorize("hasAnyRole(" +
+        "T(org.example.company.security.model.RoleTypes).EMPLOYEE_LAB.name()," +
+        "T(org.example.company.security.model.RoleTypes).EMPLOYEE_STORE.name()," +
+        "T(org.example.company.security.model.RoleTypes).EMPLOYEE_ACCOUNTING.name()," +
+        "T(org.example.company.security.model.RoleTypes).CUSTOMER.name())")
     public List<ResponseItem> getAllItems() {
         return itemService.getAllItems();
     }
 
     @GetMapping("/{id}/discount-price")
-    @IsAllowedByRole({Roles.EMPLOYEE_LAB, Roles.EMPLOYEE_STORE, Roles.EMPLOYEE_ACCOUNTING})
+    @PreAuthorize("hasAnyRole(" +
+        "T(org.example.company.security.model.RoleTypes).EMPLOYEE_LAB.name()," +
+        "T(org.example.company.security.model.RoleTypes).EMPLOYEE_STORE.name()," +
+        "T(org.example.company.security.model.RoleTypes).EMPLOYEE_ACCOUNTING.name())")
     public BigDecimal getDiscountPrice(@PathVariable long id) {
         return itemService.checkDiscountPrice(id);
     }
 
     @GetMapping("/{id}")
-    @IsAllowedByRole({Roles.EMPLOYEE_LAB, Roles.EMPLOYEE_STORE, Roles.EMPLOYEE_ACCOUNTING, Roles.CUSTOMER})
+    @PreAuthorize("hasAnyRole(" +
+        "T(org.example.company.security.model.RoleTypes).EMPLOYEE_LAB.name()," +
+        "T(org.example.company.security.model.RoleTypes).EMPLOYEE_STORE.name()," +
+        "T(org.example.company.security.model.RoleTypes).EMPLOYEE_ACCOUNTING.name()," +
+        "T(org.example.company.security.model.RoleTypes).CUSTOMER.name())")
     public ResponseItem getItemById(@PathVariable long id) {
         return itemService.getItem(id);
     }
 
     @PostMapping
-    @IsAllowedByRole({Roles.EMPLOYEE_LAB})
+    @PreAuthorize("hasRole(T(org.example.company.security.model.RoleTypes).EMPLOYEE_LAB.name())")
     public ResponseEntity<ResponseItem> createItem(@Valid @RequestBody RequestItem requestItem) {
         ResponseItem responseItem = itemService.saveItem(requestItem);
         URI location = URI.create("/items/" + responseItem.id());
@@ -70,13 +84,15 @@ public class ItemController {
     }
 
     @PutMapping("/{id}")
-    @IsAllowedByRole({Roles.EMPLOYEE_LAB, Roles.EMPLOYEE_ACCOUNTING})
+    @PreAuthorize("hasAnyRole(" +
+        "T(org.example.company.security.model.RoleTypes).EMPLOYEE_LAB.name()," +
+        "T(org.example.company.security.model.RoleTypes).EMPLOYEE_ACCOUNTING.name())")
     public ResponseItem updateItem(@PathVariable long id, @Valid @RequestBody RequestItem requestItem) {
         return itemService.updateItem(id, requestItem);
     }
 
     @DeleteMapping("/{id}")
-    @IsAllowedByRole({Roles.EMPLOYEE_LAB})
+    @PreAuthorize("hasRole(T(org.example.company.security.model.RoleTypes).EMPLOYEE_LAB.name())")
     public ResponseEntity<Void> deleteItem(@PathVariable long id) {
         itemService.deleteItem(id);
         return ResponseEntity.noContent().build();

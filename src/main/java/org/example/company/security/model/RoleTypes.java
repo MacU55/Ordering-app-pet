@@ -1,10 +1,11 @@
 package org.example.company.security.model;
 
-public enum Roles {
+public enum RoleTypes {
 
     EMPLOYEE_STORE,
     EMPLOYEE_LAB,
-    EMPLOYEE_ADMINISTRATION,
+    EMPLOYEE_ADMIN,
     EMPLOYEE_ACCOUNTING,
-    CUSTOMER
+    CUSTOMER,
+    SUPER_ADMIN,
 }

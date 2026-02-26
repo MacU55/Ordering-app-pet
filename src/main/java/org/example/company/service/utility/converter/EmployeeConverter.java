@@ -12,7 +12,7 @@ public class EmployeeConverter extends ConverterImpl<Employee, ResponseEmployee,
 
     @Override
     public ResponseEmployee convertToDTO(Employee employee) {
-        return new ResponseEmployee(employee.getUuid(), employee.getName(), employee.getEmail());
+        return new ResponseEmployee(employee.getUuid(), employee.getUserName(), employee.getEmail());
     }
 
     @Override

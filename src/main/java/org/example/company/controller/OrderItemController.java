@@ -10,6 +10,7 @@ import org.example.company.dto.request.RequestOrderItemUpdate;
 import org.example.company.dto.response.ResponseOrderItem;
 import org.example.company.service.OrderItemService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/order-items")
 @RequiredArgsConstructor
+@PreAuthorize("hasRole(T(org.example.company.security.model.RoleTypes).EMPLOYEE_ACCOUNTING.name())")
 public class OrderItemController {
 
     private final OrderItemService orderItemService;

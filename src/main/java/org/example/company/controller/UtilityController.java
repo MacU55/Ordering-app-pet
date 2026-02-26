@@ -31,4 +31,9 @@ public class UtilityController {
         return ResponseEntity.ok(messageToSend);
     }
 
+    @GetMapping("/health")
+    public ResponseEntity<String> getHealth(){
+        return ResponseEntity.ok("UtilityController is up and running");
+    }
+
 }

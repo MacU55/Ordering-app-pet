@@ -7,7 +7,7 @@ spring:
       maximum-pool-size: 10
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: true
 
 logging:
@@ -16,7 +16,7 @@ logging:
 
 company:
   utility:
-    enabled: false
+    enabled: true
   discount:
     enabled: false
   notification:

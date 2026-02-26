@@ -9,6 +9,7 @@ import org.example.company.dto.request.RequestCustomer;
 import org.example.company.dto.response.ResponseCustomer;
 import org.example.company.service.CustomerService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,8 +18,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.example.company.security.annotation.IsAllowedByRole;
-import org.example.company.security.model.Roles;
 
 @RestController
 @RequestMapping("/customers")
@@ -28,7 +27,9 @@ public class CustomerController {
     private final CustomerService customerService;
 
     @GetMapping("/by-email")
-    @IsAllowedByRole({Roles.EMPLOYEE_STORE, Roles.EMPLOYEE_ADMINISTRATION})
+    @PreAuthorize("hasAnyRole(" +
+        "T(org.example.company.security.model.RoleTypes).EMPLOYEE_STORE.name()," +
+        "T(org.example.company.security.model.RoleTypes).EMPLOYEE_ADMIN.name())")
     public ResponseEntity<ResponseCustomer> getCustomerByEmail(@RequestParam String email) {
         return customerService.findCustomerByEmail(email)
             .map(ResponseEntity::ok)
@@ -36,7 +37,9 @@ public class CustomerController {
     }
 
     @GetMapping("/by-username")
-    @IsAllowedByRole({Roles.EMPLOYEE_STORE, Roles.EMPLOYEE_ADMINISTRATION})
+    @PreAuthorize("hasAnyRole(" +
+        "T(org.example.company.security.model.RoleTypes).EMPLOYEE_STORE.name()," +
+        "T(org.example.company.security.model.RoleTypes).EMPLOYEE_ADMIN.name())")
     public ResponseEntity<ResponseCustomer> getCustomerByUserName(@RequestParam String userName) {
         return customerService.findCustomerByUserName(userName)
             .map(ResponseEntity::ok)
@@ -44,25 +47,35 @@ public class CustomerController {
     }
 
     @GetMapping("/email-exists")
-    @IsAllowedByRole({Roles.EMPLOYEE_STORE, Roles.EMPLOYEE_ADMINISTRATION, Roles.CUSTOMER})
+    @PreAuthorize("hasAnyRole(" +
+        "T(org.example.company.security.model.RoleTypes).EMPLOYEE_STORE.name()," +
+        "T(org.example.company.security.model.RoleTypes).EMPLOYEE_ADMIN.name()," +
+        "T(org.example.company.security.model.RoleTypes).CUSTOMER.name())")
     public Map<String, Boolean> checkEmailExists(@RequestParam String email) {
         return Map.of("exists", customerService.existsByEmail(email));
     }
 
     @GetMapping("/{id}")
-    @IsAllowedByRole({Roles.EMPLOYEE_STORE, Roles.EMPLOYEE_ADMINISTRATION, Roles.CUSTOMER})
+    @PreAuthorize("hasAnyRole(" +
+        "T(org.example.company.security.model.RoleTypes).EMPLOYEE_STORE.name()," +
+        "T(org.example.company.security.model.RoleTypes).EMPLOYEE_ADMIN.name()," +
+        "T(org.example.company.security.model.RoleTypes).CUSTOMER.name())")
     public ResponseCustomer getCustomer(@PathVariable Long id) {
         return customerService.findCustomerById(id);
     }
 
     @GetMapping
-    @IsAllowedByRole({Roles.EMPLOYEE_STORE, Roles.EMPLOYEE_ADMINISTRATION})
+    @PreAuthorize("hasAnyRole(" +
+        "T(org.example.company.security.model.RoleTypes).EMPLOYEE_STORE.name()," +
+        "T(org.example.company.security.model.RoleTypes).EMPLOYEE_ADMIN.name())")
     public List<ResponseCustomer> getAllCustomers() {
         return customerService.findAllCustomers();
     }
 
     @PostMapping
-    @IsAllowedByRole({Roles.EMPLOYEE_STORE, Roles.CUSTOMER})
+    @PreAuthorize("hasAnyRole(" +
+        "T(org.example.company.security.model.RoleTypes).EMPLOYEE_STORE.name()," +
+        "T(org.example.company.security.model.RoleTypes).CUSTOMER.name())")
     public ResponseEntity<ResponseCustomer> createCustomer(@Valid @RequestBody RequestCustomer requestCustomer) {
         ResponseCustomer customer = customerService.createCustomer(requestCustomer);
         URI location = URI.create("/customers/" + customer.id());
@@ -70,7 +83,10 @@ public class CustomerController {
     }
 
     @PutMapping("/{id}")
-    @IsAllowedByRole({Roles.EMPLOYEE_STORE, Roles.EMPLOYEE_ADMINISTRATION, Roles.CUSTOMER})
+    @PreAuthorize("hasAnyRole(" +
+        "T(org.example.company.security.model.RoleTypes).EMPLOYEE_STORE.name()," +
+        "T(org.example.company.security.model.RoleTypes).EMPLOYEE_ADMIN.name()," +
+        "T(org.example.company.security.model.RoleTypes).CUSTOMER.name())")
     public ResponseCustomer updateCustomer(@PathVariable Long id, @Valid @RequestBody RequestCustomer requestCustomer) {
         return customerService.updateCustomer(id, requestCustomer);
     }

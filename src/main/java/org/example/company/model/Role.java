@@ -1,5 +1,7 @@
 package org.example.company.model;
 
+import org.example.company.security.model.RoleTypes;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import jakarta.persistence.Entity;
@@ -8,6 +10,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,13 +21,15 @@ import lombok.Setter;
 public class Role extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
-    private DepartmentRole departmentRole;
+    private RoleTypes roleTypes;
+
+    public Role () {}
 
     @ManyToMany
     @JoinTable(
         name = "employee_role",
-        joinColumns = @JoinColumn(name = "employee_id"),
-        inverseJoinColumns = @JoinColumn(name = "role_id")
+        joinColumns = @JoinColumn(name = "role_id"),
+        inverseJoinColumns = @JoinColumn(name = "employee_id")
     )
     private Set<Employee> employees = new HashSet<>();
 

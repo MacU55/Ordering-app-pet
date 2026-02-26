@@ -10,6 +10,7 @@ A RESTful ordering system built with Spring Boot 4.0 and Java 25.
 - **MySQL** - Database
 - **Lombok** - Reducing boilerplate code
 - **Hibernate Validator** - Input validation
+- **SpringDoc OpenAPI** - Swagger UI for API documentation
 - **JUnit 5** - Testing
 
 ## Features
@@ -112,6 +113,37 @@ The application will start on `http://localhost:8080`
 # Test
 ./gradlew bootRun --args='--spring.profiles.active=test'
 ```
+
+## Swagger UI
+
+The application provides an interactive API documentation via Swagger UI (SpringDoc OpenAPI).
+
+### How to Access
+
+1. Start the application:
+   ```bash
+   ./gradlew bootRun
+   ```
+
+2. Open Swagger UI in your browser:
+   ```
+   http://localhost:8080/swagger-ui.html
+   ```
+   or
+   ```
+   http://localhost:8080/swagger-ui/index.html
+   ```
+
+3. The OpenAPI specification (JSON) is available at:
+   ```
+   http://localhost:8080/v3/api-docs
+   ```
+
+### Using Swagger UI
+
+- **Try it out** — Click "Try it out" on any endpoint to execute requests directly from the browser.
+- **Headers** — Use the Parameters section to add `X-User-Email` and `X-User-Role` headers for authenticated requests.
+- **Bootstrap (create first employee)** — Use `POST /employees/admin/employee` with header `X-User-Role: SUPER_ADMIN`.
 
 ## API Documentation
 
