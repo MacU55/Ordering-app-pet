@@ -37,18 +37,6 @@ public class Customer extends BaseEntity {
         this.email = email;
     }
 
-    public void updateCustomer(RequestCustomer r) {
-        if(r.firstName() != null) this.firstName = r.firstName();
-        if(r.lastName() != null) this.lastName = r.lastName();
-        if(r.userName() != null) this.userName = r.userName();
-        if(r.email() != null) this.email = r.email();
-    }
-
-    public ResponseCustomer toResponseCustomer(Customer customer) {
-        return new ResponseCustomer(customer.getId(), customer.getFirstName(), customer.getLastName(),
-            customer.getUserName());
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -62,10 +62,13 @@ public class CustomerService {
     }
 
     @Transactional
-    public ResponseCustomer updateCustomer(long customerId, RequestCustomer requestCustomer) {
+    public ResponseCustomer updateCustomer(long customerId, RequestCustomer r) {
         Customer customer = customerRepository.findById(customerId)
             .orElseThrow(() -> new EntityNotFoundException("Customer not found for uuid= " + customerId));
-         customer.updateCustomer(requestCustomer);
+        if(r.firstName() != null) customer.setFirstName(r.firstName());
+        if(r.lastName() != null) customer.setLastName(r.lastName());
+        if(r.userName() != null) customer.setUserName(r.userName());
+        if(r.email() != null) customer.setEmail(r.email());
         return customerConverter.convertToDTO(customer);
     }
 }
