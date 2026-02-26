@@ -57,8 +57,7 @@ public class EmployeeController {
 
     @GetMapping
     public List<ResponseEmployee> getAllEmployees() {
-        List<Employee> allEmployees = employeeService.getAllEmployees();
-        return allEmployees.stream().map(employeeConverter::convertToDTO).toList();
+        return employeeService.getAllEmployees();
     }
 
 //    @GetMapping("/{id}/roleType")

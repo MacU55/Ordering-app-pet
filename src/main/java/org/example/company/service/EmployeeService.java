@@ -3,6 +3,7 @@ package org.example.company.service;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,8 +48,8 @@ public class EmployeeService {
 //    }
 
     @Transactional(readOnly = true)
-    public List<Employee> getAllEmployees() {
-        return employeeRepository.findAll();
+    public List<ResponseEmployee> getAllEmployees() {
+        return employeeRepository.findAll().stream().map(employeeConverter::convertToDTO).collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
