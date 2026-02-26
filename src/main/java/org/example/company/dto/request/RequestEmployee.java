@@ -1,10 +1,10 @@
 package org.example.company.dto.request;
 
-import jakarta.validation.constraints.NotNull;
+import org.example.company.service.validation.Mandatory;
 
 public record RequestEmployee(
-    @NotNull(message = "name is mandatory") String name,
-    @NotNull(message = "salary is mandatory") Double salary,
+    @Mandatory String name,
+    @Mandatory Double salary,
      int roleType
 ) {
 }
