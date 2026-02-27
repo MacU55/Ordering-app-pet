@@ -1,8 +1,11 @@
-package org.example.company.service.integrationTests;
+package org.example.company.service.integration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import java.math.BigDecimal;
+import java.net.http.HttpRequest;
+import org.example.company.controller.EmployeeController;
+import org.example.company.dto.request.RequestEmployee;
 import org.example.company.dto.request.RequestItem;
 import org.example.company.dto.response.ResponseItem;
 import org.example.company.model.ItemType;
@@ -16,16 +19,17 @@ import org.springframework.test.context.TestPropertySource;
 
 @SpringBootTest
 @ActiveProfiles("prod")
-@TestPropertySource(properties = "company.discount.enabled=true")
 public class ItemServiceProdProfileTest extends BaseTestConfig {
 
     private final ItemService itemService;
     private final DiscountService discountService;
+    private final EmployeeController employeeController;
 
     @Autowired
-    public ItemServiceProdProfileTest(ItemService itemService, DiscountService discountService) {
+    public ItemServiceProdProfileTest(ItemService itemService, DiscountService discountService, EmployeeController employeeController) {
         this.itemService = itemService;
         this.discountService = discountService;
+        this.employeeController = employeeController;
     }
 
     @Test

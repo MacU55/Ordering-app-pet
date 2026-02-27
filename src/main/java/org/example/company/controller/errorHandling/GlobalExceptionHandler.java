@@ -13,11 +13,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.example.company.dto.response.error.ErrorResponse;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 
 @Slf4j
 @RestControllerAdvice
-@ConditionalOnWebApplication
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(EntityNotFoundException.class)

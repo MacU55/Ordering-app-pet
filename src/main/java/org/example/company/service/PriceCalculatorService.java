@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-@ConditionalOnWebApplication
 public class PriceCalculatorService {
 
     private DiscountService discountService;

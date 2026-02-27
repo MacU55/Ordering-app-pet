@@ -1,4 +1,4 @@
-package org.example.company.service.integrationTests;
+package org.example.company.service.integration;
 
 import org.example.company.dto.request.RequestItem;
 import org.example.company.dto.response.ResponseItem;
