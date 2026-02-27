@@ -86,4 +86,9 @@ public class OrderItemService {
         }
         orderItemRepository.deleteById(id);
     }
+
+    public void addOrderItem(Order order, List<OrderItem> orderItemList, Item item, int quantity, BigDecimal priceAtOrderTime) {
+        OrderItem orderItem = new OrderItem(order, item, quantity, priceAtOrderTime);
+        orderItemList.add(orderItem);
+    }
 }

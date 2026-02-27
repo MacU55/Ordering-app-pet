@@ -50,31 +50,10 @@ public class Order extends BaseEntity {
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
-//    long id,
-//    LocalDateTime orderDateCreated,
-//    LocalDateTime orderDateDelivered,
-//    List<ResponseOrderItem> items,
-//    long customerId
-
-    public Order(LocalDateTime orderDateCreated, List<OrderItem> orderItems, Customer customer) {
-        this.createdAt = orderDateCreated;
-        this.orderItemList = orderItems;
-        this.customer = customer;
-    }
-
     public Order(List<OrderItem> orderItems, Customer customer) {
         this.createdAt = LocalDateTime.now();
         this.orderItemList = orderItems;
         this.customer = customer;
-    }
-
-    public void addOrderItem(Item item, int quantity, BigDecimal priceAtOrderTime) {
-        OrderItem orderItem = new OrderItem(this, item, quantity, priceAtOrderTime);
-        orderItemList.add(orderItem);
-    }
-
-    public void clearOrderItems() {
-        this.orderItemList.clear();
     }
 
     @Override

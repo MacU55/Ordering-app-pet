@@ -28,6 +28,7 @@ public class OrderService {
     private final CustomerRepository customerRepository;
     private final EmployeeRepository employeeRepository;
     private final OrderConverter orderConverter;
+    private final OrderItemService orderItemService;
 
 
     @Transactional
@@ -80,7 +81,7 @@ public class OrderService {
             .orElseThrow(() -> new EntityNotFoundException("Order not found. Order uuid= " + orderId));
         var customer = customerRepository.findById(requestOrder.customerId())
             .orElseThrow(() -> new EntityNotFoundException("Customer not found: " + requestOrder.customerId()));
-        existingOrder.clearOrderItems();
+        this.clearOrderItems(existingOrder);
         existingOrder.setCustomer(customer);
         this.processOrder(requestOrder, existingOrder);
         return orderConverter.convertToDTO(orderRepository.save(existingOrder));
@@ -127,8 +128,12 @@ public class OrderService {
         for (var orderItem : requestOrder.items()) {
             var item = itemRepository.findById(orderItem.itemId())
                 .orElseThrow(() -> new EntityNotFoundException("Item not found. Item uuid= " + orderItem.itemId()));
-            order.addOrderItem(item, orderItem.quantity(), item.getPrice());
+            orderItemService.addOrderItem(order, order.getOrderItemList(), item, orderItem.quantity(), item.getPrice());
         }
+    }
+
+    private void clearOrderItems(Order order) {
+        order.getOrderItemList().clear();
     }
 
 }
