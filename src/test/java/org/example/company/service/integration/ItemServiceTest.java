@@ -15,13 +15,13 @@ import java.util.Optional;
 
 
 @SpringBootTest
-public class ItemServiceTest extends BaseTestConfig {
+class ItemServiceTest extends BaseTestConfig {
 
     private final ItemService itemService;
     private RequestItem baseRequestItem;
 
     @Autowired
-    public ItemServiceTest(ItemService itemService) {
+    ItemServiceTest(ItemService itemService) {
         this.itemService = itemService;
     }
 
@@ -29,7 +29,7 @@ public class ItemServiceTest extends BaseTestConfig {
     private DiscountService discountService;
 
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         this.baseRequestItem = new RequestItem("Base testItem",
             "Base testItemDescription",
             new BigDecimal("48.59"),
@@ -37,7 +37,7 @@ public class ItemServiceTest extends BaseTestConfig {
     }
 
     @Test
-    public void testExistsById() {
+    void testExistsById() {
         long notExistItemId = 1001;
         ResponseItem responseItem = itemService.saveItem(baseRequestItem);
         long itemId = responseItem.id();
@@ -46,7 +46,7 @@ public class ItemServiceTest extends BaseTestConfig {
     }
 
     @Test
-    public void testFindItemByName() {
+    void testFindItemByName() {
         ResponseItem responseItem = itemService.saveItem(baseRequestItem);
         Optional<ResponseItem> responseItemName = itemService.findItemByName(responseItem.name());
         assertTrue(responseItemName.isPresent());
@@ -54,7 +54,7 @@ public class ItemServiceTest extends BaseTestConfig {
     }
 
     @Test
-    public void testUpdateItem() {
+    void testUpdateItem() {
         ResponseItem responseItem = itemService.saveItem(baseRequestItem);
         RequestItem updateRequestItem = new RequestItem("New testItem",
             "New testItemDescription",
@@ -68,15 +68,10 @@ public class ItemServiceTest extends BaseTestConfig {
     }
 
     @Test
-    public void testCheckDiscountPriceForNotProdProfile() {
+    void testCheckDiscountPriceForNotProdProfile() {
         assertNull(discountService);
         ResponseItem responseItem = itemService.saveItem(baseRequestItem);
         BigDecimal checkedDiscountPrice = itemService.checkDiscountPrice(responseItem.id());
         assertEquals(baseRequestItem.price(), checkedDiscountPrice);
     }
-
-
-
-
-
 }

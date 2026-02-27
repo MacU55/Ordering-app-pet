@@ -19,21 +19,21 @@ import org.springframework.test.context.TestPropertySource;
 
 @SpringBootTest
 @ActiveProfiles("prod")
-public class ItemServiceProdProfileTest extends BaseTestConfig {
+class ItemServiceProdProfileTest extends BaseTestConfig {
 
     private final ItemService itemService;
     private final DiscountService discountService;
     private final EmployeeController employeeController;
 
     @Autowired
-    public ItemServiceProdProfileTest(ItemService itemService, DiscountService discountService, EmployeeController employeeController) {
+    ItemServiceProdProfileTest(ItemService itemService, DiscountService discountService, EmployeeController employeeController) {
         this.itemService = itemService;
         this.discountService = discountService;
         this.employeeController = employeeController;
     }
 
     @Test
-    public void testCheckDiscountPriceForProdProfile() {
+    void testCheckDiscountPriceForProdProfile() {
         RequestItem baseRequestItem = new RequestItem("Base testItem",
             "Base testItemDescription",
             new BigDecimal("48.59"),

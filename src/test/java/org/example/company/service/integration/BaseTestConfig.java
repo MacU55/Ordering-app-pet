@@ -7,7 +7,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 @Testcontainers
-public abstract class BaseTestConfig {
+abstract class BaseTestConfig {
 
     @Container
     static MySQLContainer<?> mysql = new MySQLContainer<>("mysql:8.1")

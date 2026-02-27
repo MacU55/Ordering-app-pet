@@ -5,6 +5,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import java.math.BigDecimal;
 import org.example.company.dto.request.RequestItem;
@@ -21,7 +23,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class ItemServiceMockTest {
+class ItemServiceMockTest {
 
     private RequestItem requestItem;
 
@@ -57,6 +59,7 @@ public class ItemServiceMockTest {
             (item.getName().equals(requestItem.name()) && item.getPrice().equals(requestItem.price()))
             && (item.getDescription().equals(requestItem.description()) && item.getType().equals(requestItem.itemType()))
         ));
+        verifyNoMoreInteractions(itemRepository);
     }
 
 }

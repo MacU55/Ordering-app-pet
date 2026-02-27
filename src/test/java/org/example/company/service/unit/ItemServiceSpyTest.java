@@ -8,6 +8,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import java.math.BigDecimal;
 import java.util.Optional;
@@ -27,7 +28,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class ItemServiceSpyTest {
+class ItemServiceSpyTest {
 
     @Mock
     private ItemRepository itemRepository;
@@ -76,7 +77,8 @@ public class ItemServiceSpyTest {
         BigDecimal result = itemService.checkDiscountPrice(itemId);
         assertEquals(discountedPrice, result);
         verify(itemRepository).findById(itemId);
-        verify(priceCalculatorService).getDiscountPrice(eq(basePrice), eq(ItemType.CLOTHES));
+        verify(priceCalculatorService).getDiscountPrice(basePrice, ItemType.CLOTHES);
+        verifyNoMoreInteractions(itemRepository);
     }
 
     @Test
