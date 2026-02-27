@@ -59,13 +59,11 @@ public class OrderItemService {
             .orElseThrow(() -> new EntityNotFoundException("Order not found for uuid= " + request.orderId()));
         Item item = itemRepository.findById(request.itemId())
             .orElseThrow(() -> new EntityNotFoundException("Item not found for uuid= " + request.itemId()));
-//        BigDecimal price = request.price() != null ? request.price() : item.getPrice();
         BigDecimal price = item.getPrice().multiply(new BigDecimal(request.quantity()));
         OrderItem orderItem = new OrderItem(order, item, request.quantity(), price);
         order.getOrderItemList().add(orderItem);
         orderItemRepository.save(orderItem);
          return  orderItemConverter.convertToDTO(orderItem);
-//        return ResponseOrderItem.fromOrderItem(orderItem);
     }
 
     @Transactional

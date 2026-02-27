@@ -50,6 +50,12 @@ public class CustomerService {
         return customerRepository.findAll().stream().map(customerConverter::convertToDTO).toList();
     }
 
+    /**
+     * Method to create customer
+     * @param requestCustomer (DTO for request)
+     * @return ResponseCustomer object (DTO for response)
+     */
+
     @Transactional
     public ResponseCustomer createCustomer(RequestCustomer requestCustomer) {
         if (customerRepository.existsByEmail(requestCustomer.email())) {
@@ -61,14 +67,21 @@ public class CustomerService {
         }
     }
 
+    /**
+     * Method to update exist customer
+     * @param customerId
+     * @param requestCustomer (DTO for request)
+     * @return ResponseCustomer object (DTO for response)
+     */
+
     @Transactional
-    public ResponseCustomer updateCustomer(long customerId, RequestCustomer r) {
+    public ResponseCustomer updateCustomer(long customerId, RequestCustomer requestCustomer) {
         Customer customer = customerRepository.findById(customerId)
             .orElseThrow(() -> new EntityNotFoundException("Customer not found for uuid= " + customerId));
-        if(r.firstName() != null) customer.setFirstName(r.firstName());
-        if(r.lastName() != null) customer.setLastName(r.lastName());
-        if(r.userName() != null) customer.setUserName(r.userName());
-        if(r.email() != null) customer.setEmail(r.email());
+        if(requestCustomer.firstName() != null) customer.setFirstName(requestCustomer.firstName());
+        if(requestCustomer.lastName() != null) customer.setLastName(requestCustomer.lastName());
+        if(requestCustomer.userName() != null) customer.setUserName(requestCustomer.userName());
+        if(requestCustomer.email() != null) customer.setEmail(requestCustomer.email());
         return customerConverter.convertToDTO(customer);
     }
 }

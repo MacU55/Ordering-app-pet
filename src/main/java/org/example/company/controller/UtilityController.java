@@ -1,5 +1,8 @@
 package org.example.company.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.example.company.service.notification.NotificationService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/utility")
+@Tag(name = "Utility", description = "Utility endpoints (enabled via company.utility.enabled=true)")
 @ConditionalOnProperty(name = "company.utility.enabled", havingValue = "true")
 public class UtilityController {
 
@@ -20,18 +24,22 @@ public class UtilityController {
     }
 
     @GetMapping("/mainInfo")
+    @Operation(summary = "Get main info")
     public ResponseEntity<String> getMainInfo(){
         return ResponseEntity.ok("This is the main info from utility controller");
     }
 
 
     @GetMapping("/notification/{message}")
-    public ResponseEntity<String> getNotifications(@PathVariable String message){
+    @Operation(summary = "Send notification and get response")
+    public ResponseEntity<String> getNotifications(
+        @Parameter(description = "Notification message") @PathVariable String message){
         String messageToSend = notificationService.sendNotification(message);
         return ResponseEntity.ok(messageToSend);
     }
 
     @GetMapping("/health")
+    @Operation(summary = "Health check")
     public ResponseEntity<String> getHealth(){
         return ResponseEntity.ok("UtilityController is up and running");
     }

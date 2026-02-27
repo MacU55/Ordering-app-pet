@@ -1,6 +1,5 @@
 package org.example.company.model;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -18,12 +17,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 @Entity
 @Getter
 @Setter
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "orders")
@@ -66,5 +63,16 @@ public class Order extends BaseEntity {
     @Override
     public int hashCode() {
         return getClass().hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "Order{" +
+            "id=" + id +
+            ", createdAt=" + createdAt +
+            ", updatedAt=" + updatedAt +
+            ", orderDateDelivered=" + orderDateDelivered +
+            ", customer=" + (customer != null ? customer.id : "null") +
+            '}';
     }
 }

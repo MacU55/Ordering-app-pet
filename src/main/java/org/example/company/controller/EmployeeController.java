@@ -2,6 +2,11 @@ package org.example.company.controller;
 
 import java.net.URI;
 import java.util.List;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.company.dto.request.RequestEmployee;
@@ -24,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/employees")
 @RequiredArgsConstructor
+@Tag(name = "Employees", description = "Employee management API")
 @PreAuthorize("hasRole(T(org.example.company.security.model.RoleTypes).EMPLOYEE_ADMIN.name())")
 public class EmployeeController {
 
@@ -31,57 +37,86 @@ public class EmployeeController {
     private final EmployeeConverter employeeConverter;
 
     @GetMapping("/by-name")
-    public ResponseEntity<ResponseEmployee> getEmployeeByName(@RequestParam String name) {
+    @Operation(summary = "Get employee by name")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Found"),
+        @ApiResponse(responseCode = "404", description = "Not found")
+    })
+    public ResponseEntity<ResponseEmployee> getEmployeeByName(
+        @Parameter(description = "Employee name") @RequestParam String name) {
         return employeeService.findEmployeeByName(name)
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/by-email")
-    public ResponseEntity<ResponseEmployee> getEmployeeByEmail(@RequestParam String email) {
+    @Operation(summary = "Get employee by email")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Found"),
+        @ApiResponse(responseCode = "404", description = "Not found")
+    })
+    public ResponseEntity<ResponseEmployee> getEmployeeByEmail(
+        @Parameter(description = "Employee email") @RequestParam String email) {
         return employeeService.findEmployeeByEmail(email)
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.notFound().build());
     }
 
-//    @GetMapping("/by-roleType")
-//    public List<ResponseEmployee> getEmployeesByDepartment(@RequestParam RoleTypes departmentRole) {
-//        return employeeService.findEmployeesByDepartment(departmentRole);
-//    }
-
     @GetMapping("/{id}")
-    public ResponseEmployee getEmployeeById(@PathVariable long id) {
+    @Operation(summary = "Get employee by ID")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Found"),
+        @ApiResponse(responseCode = "404", description = "Not found")
+    })
+    public ResponseEmployee getEmployeeById(
+        @Parameter(description = "Employee ID") @PathVariable long id) {
         Employee employee = employeeService.getEmployeeById(id);
         return employeeConverter.convertToDTO(employee);
     }
 
     @GetMapping
+    @Operation(summary = "Get all employees")
     public List<ResponseEmployee> getAllEmployees() {
         return employeeService.getAllEmployees();
     }
 
-//    @GetMapping("/{id}/roleType")
-//    @IsAllowedByRole({RoleTypes.EMPLOYEE_ADMIN})
-//    public Set<RoleTypes> getDepartmentInfo(@PathVariable long id) {
-//        return employeeService.getDepartmentInfoByEmployeeId(id);
-//    }
-
     @PostMapping
+    @Operation(summary = "Create employee",
+        description = "Requires EMPLOYEE_ADMIN or SUPER_ADMIN role.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "201", description = "Employee created successfully"),
+        @ApiResponse(responseCode = "403", description = "Access denied"),
+        @ApiResponse(responseCode = "400", description = "Invalid request body")
+    })
     @PreAuthorize("hasAnyRole(T(org.example.company.security.model.RoleTypes).EMPLOYEE_ADMIN.name()," +
         "T(org.example.company.security.model.RoleTypes).SUPER_ADMIN.name())")
-    public ResponseEntity<ResponseEmployee> createEmployee(@Valid @RequestBody RequestEmployee employee) {
+    public ResponseEntity<ResponseEmployee> createEmployee(
+        @Parameter(description = "Employee data") @Valid @RequestBody RequestEmployee employee) {
         ResponseEmployee responseEmployee = employeeService.saveEmployee(employee);
         URI location = URI.create("/employees/" + responseEmployee.uuid());
         return ResponseEntity.created(location).body(responseEmployee);
     }
 
     @PutMapping("/{id}")
-    public ResponseEmployee updateEmployee(@PathVariable long id, @Valid @RequestBody RequestEmployee employee) {
+    @Operation(summary = "Update employee")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Employee updated"),
+        @ApiResponse(responseCode = "404", description = "Employee not found")
+    })
+    public ResponseEmployee updateEmployee(
+        @Parameter(description = "Employee ID") @PathVariable long id,
+        @Parameter(description = "Updated employee data") @Valid @RequestBody RequestEmployee employee) {
         return employeeService.updateEmployee(id, employee);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteEmployee(@PathVariable long id) {
+    @Operation(summary = "Delete employee")
+    @ApiResponses({
+        @ApiResponse(responseCode = "204", description = "Employee deleted"),
+        @ApiResponse(responseCode = "404", description = "Employee not found")
+    })
+    public ResponseEntity<Void> deleteEmployee(
+        @Parameter(description = "Employee ID") @PathVariable long id) {
         employeeService.deleteEmployee(id);
         return ResponseEntity.noContent().build();
     }

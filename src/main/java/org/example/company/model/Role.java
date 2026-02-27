@@ -33,4 +33,12 @@ public class Role extends BaseEntity {
     )
     private Set<Employee> employees = new HashSet<>();
 
+    @Override
+    public String toString() {
+        return "Role{" +
+            " id=" + id +
+            ", createdAt=" + createdAt +
+            ", updatedAt=" + updatedAt +
+            '}';
+    }
 }

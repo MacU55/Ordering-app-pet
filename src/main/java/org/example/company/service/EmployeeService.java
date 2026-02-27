@@ -40,13 +40,6 @@ public class EmployeeService {
         return employeeRepository.findByEmail(email).map(employeeConverter::convertToDTO);
     }
 
-//    @Transactional(readOnly = true)
-//    public List<ResponseEmployee> findEmployeesByDepartment(RoleTypes departmentRole) {
-//        return employeeRepository.findByDepartment(departmentRole).stream()
-//            .map(employeeConverter::convertToDTO)
-//            .collect(Collectors.toList());
-//    }
-
     @Transactional(readOnly = true)
     public List<ResponseEmployee> getAllEmployees() {
         return employeeRepository.findAll().stream().map(employeeConverter::convertToDTO).collect(Collectors.toList());
@@ -57,6 +50,14 @@ public class EmployeeService {
         return employeeRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Employee with uuid " + id + " not found"));
     }
+
+    /**
+     * Saves a new employee to the database.
+     * Generates an email from userName and assigns a role based on roleType.
+     *
+     * @param requestEmployee the employee data to create
+     * @return the created employee (uuid, userName, email)
+     */
 
     @Transactional
     public ResponseEmployee saveEmployee(RequestEmployee requestEmployee) {
@@ -83,30 +84,21 @@ public class EmployeeService {
         throw new InternalServiceException(BaseException.ErrorType.INTERNAL_SERVER_ERROR);
     }
 
-@Transactional
-public ResponseEmployee updateEmployee(long employeeId, RequestEmployee requestEmployee) {
-    Employee employee = employeeRepository.findById(employeeId)
-        .orElseThrow(() -> new EntityNotFoundException("Employee with uuid " + employeeId + " not found"));
-    employee.updateEmployee(requestEmployee);
-    return employeeConverter.convertToDTO(employee);
-}
-
-@Transactional
-public void deleteEmployee(long id) {
-    if (employeeRepository.existsById(id)) {
-        employeeRepository.deleteById(id);
-    } else {
-        log.error("Employee with uuid {} not found", id);
-        throw new EntityNotFoundException("Employee with uuid " + id + " not found");
+    @Transactional
+    public ResponseEmployee updateEmployee(long employeeId, RequestEmployee requestEmployee) {
+        Employee employee = employeeRepository.findById(employeeId)
+            .orElseThrow(() -> new EntityNotFoundException("Employee with uuid " + employeeId + " not found"));
+        employee.updateEmployee(requestEmployee);
+        return employeeConverter.convertToDTO(employee);
     }
-}
 
-//    @Transactional(readOnly = true)
-//    public Set<RoleTypes> getDepartmentInfoByEmployeeId(long employeeId) {
-//        Employee employee = employeeRepository.findById(employeeId)
-//            .orElseThrow(() -> new EntityNotFoundException("Employee with uuid " + employeeId + " not found"));
-//        Set<RoleTypes> departmentRoles =
-//            employee.getRoleEntities().stream().map(Role::getRoleEntities).collect(Collectors.toSet());
-//        return departmentRoles.stream().map(RoleTypes::getInfo).collect(Collectors.toSet());
-//    }
+    @Transactional
+    public void deleteEmployee(long id) {
+        if (employeeRepository.existsById(id)) {
+            employeeRepository.deleteById(id);
+        } else {
+            log.error("Employee with uuid {} not found", id);
+            throw new EntityNotFoundException("Employee with uuid " + id + " not found");
+        }
+    }
 }

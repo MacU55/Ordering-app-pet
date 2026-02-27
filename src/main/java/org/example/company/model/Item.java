@@ -9,12 +9,14 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import org.example.company.dto.request.RequestItem;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
+@ToString
 @Table(name = "items")
 public class Item extends BaseEntity {
 
@@ -44,8 +46,6 @@ public class Item extends BaseEntity {
         this.price = price;
         this.type = type;
     }
-
-
 
     public void updateItem(RequestItem requestItem){
         this.name = requestItem.name();

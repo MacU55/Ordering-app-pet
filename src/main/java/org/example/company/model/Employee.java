@@ -1,14 +1,11 @@
 package org.example.company.model;
 
-import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,10 +33,6 @@ public class Employee extends BaseEntity {
     @Column(nullable = false, unique = true)
     private String email;
 
-//    @Enumerated(EnumType.STRING)
-//    private RoleTypes departmentRole;
-
-
     public Employee(String userName, double salary) {
         this.userName = userName;
         this.salary = salary;
@@ -47,9 +40,11 @@ public class Employee extends BaseEntity {
     }
 
     @ManyToMany(mappedBy = "employees")
+    @ToString.Exclude
     private Set<Order> orders = new HashSet<>();
 
     @ManyToMany(mappedBy = "employees")
+    @ToString.Exclude
     private Set<Role> roleEntities = new HashSet<>();
 
     public void updateEmployee(RequestEmployee r) {

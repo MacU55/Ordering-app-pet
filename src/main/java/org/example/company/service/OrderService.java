@@ -37,7 +37,6 @@ public class OrderService {
         var customer = customerRepository.findById(requestOrder.customerId())
             .orElseThrow(() -> new EntityNotFoundException("Customer not found: " + requestOrder.customerId()));
         var order = new Order();
-//        order.setOrderDateCreated(LocalDateTime.now());
         order.setCustomer(customer);
         this.processOrder(requestOrder, order);
         orderRepository.save(order);

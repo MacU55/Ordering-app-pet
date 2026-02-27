@@ -3,7 +3,6 @@ package org.example.company.repository;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import io.swagger.v3.oas.annotations.Parameter;
 import org.example.company.model.Employee;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -27,5 +26,4 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     @Modifying
     @Query(value = "INSERT INTO employee_role (role_id, employee_id) values (:role_id, :employee_id)", nativeQuery = true)
     void createRoleForEmployee(@Param("role_id") long roleId, @Param("employee_id") long employeeId);
-//    List<Employee> findByDepartment(RoleTypes departmentRole);
 }

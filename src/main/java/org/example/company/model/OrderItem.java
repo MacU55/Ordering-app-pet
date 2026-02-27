@@ -22,7 +22,6 @@ import lombok.ToString;
 @Getter
 @Setter
 @NoArgsConstructor
-@ToString
 public class OrderItem extends BaseEntity {
 
     @ManyToOne(optional = false)
@@ -62,5 +61,18 @@ public class OrderItem extends BaseEntity {
     @Override
     public int hashCode() {
         return getClass().hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "OrderItem{" +
+            " id=" + id +
+            ", createdAt=" + createdAt +
+            ", updatedAt=" + updatedAt +
+            ", order=" + (order != null ? order.id : 0) +
+            ", item=" + (item != null ? item.id : 0) +
+            ", quantity=" + quantity +
+            ", priceAtOrderTime=" + priceAtOrderTime +
+            '}';
     }
 }
