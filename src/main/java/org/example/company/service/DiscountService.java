@@ -13,9 +13,10 @@ import org.springframework.stereotype.Service;
 public class DiscountService {
 
     private static final int DAYS_IN_WEEK_OPERATIONAL = 6;
+    private static final int LAST_WEEK_DISCOUNT_FACTOR = 2;
 
     public BigDecimal calculateDiscount(double baseDiscountValue) {
-        double value = this.isLastWeekOfMonth(LocalDate.now()) ? baseDiscountValue * 2 : baseDiscountValue;
+        double value = this.isLastWeekOfMonth(LocalDate.now()) ? baseDiscountValue * LAST_WEEK_DISCOUNT_FACTOR : baseDiscountValue;
         return BigDecimal.valueOf(value);
     }
 

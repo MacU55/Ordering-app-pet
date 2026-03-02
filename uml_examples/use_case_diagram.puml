@@ -13,103 +13,101 @@ actor "Employee\n(ACCOUNTING)" as emp_accounting #lightgray
 
 ' ===== SYSTEM BOUNDARY =====
 rectangle "Ordering System" {
-    
-    ' --- Order Management ---
-    package "Order Management" {
-        usecase "Create Order" as UC_CREATE_ORDER
-        usecase "View Order" as UC_VIEW_ORDER
-        usecase "View All Orders" as UC_VIEW_ALL_ORDERS
-        usecase "Update Order" as UC_UPDATE_ORDER
-        usecase "Delete Order" as UC_DELETE_ORDER
-        usecase "Deliver Order" as UC_DELIVER_ORDER
-        usecase "View Undelivered Orders" as UC_UNDELIVERED
-        usecase "Assign Employee to Order" as UC_ASSIGN_EMP
-        usecase "Remove Employee from Order" as UC_REMOVE_EMP
+    left to right direction
+
+    together {
+        package "Order Management" {
+            usecase "Create Order" as UC_CREATE_ORDER
+            usecase "View Order" as UC_VIEW_ORDER
+            usecase "View All Orders" as UC_VIEW_ALL_ORDERS
+            usecase "Update Order" as UC_UPDATE_ORDER
+            usecase "Delete Order" as UC_DELETE_ORDER
+            usecase "Deliver Order" as UC_DELIVER_ORDER
+            usecase "View Undelivered Orders" as UC_UNDELIVERED
+            usecase "Assign Employee to Order" as UC_ASSIGN_EMP
+            usecase "Remove Employee from Order" as UC_REMOVE_EMP
+        }
+        package "Item Catalog" {
+            usecase "View Items" as UC_VIEW_ITEMS
+            usecase "View Item Details" as UC_VIEW_ITEM
+            usecase "Create Item" as UC_CREATE_ITEM
+            usecase "Update Item" as UC_UPDATE_ITEM
+            usecase "Delete Item" as UC_DELETE_ITEM
+            usecase "Check Discount Price" as UC_DISCOUNT
+        }
     }
-    
-    ' --- Item Catalog ---
-    package "Item Catalog" {
-        usecase "View Items" as UC_VIEW_ITEMS
-        usecase "View Item Details" as UC_VIEW_ITEM
-        usecase "Create Item" as UC_CREATE_ITEM
-        usecase "Update Item" as UC_UPDATE_ITEM
-        usecase "Delete Item" as UC_DELETE_ITEM
-        usecase "Check Discount Price" as UC_DISCOUNT
+    together {
+        package "Employee Management" {
+            usecase "View Employees" as UC_VIEW_EMPLOYEES
+            usecase "Create Employee" as UC_CREATE_EMPLOYEE
+            usecase "Update Employee" as UC_UPDATE_EMPLOYEE
+            usecase "Delete Employee" as UC_DELETE_EMPLOYEE
+        }
+        package "Customer Management" {
+            usecase "View Customers" as UC_VIEW_CUSTOMERS
+            usecase "View Customer Details" as UC_VIEW_CUSTOMER
+            usecase "Create Customer" as UC_CREATE_CUSTOMER
+            usecase "Update Customer" as UC_UPDATE_CUSTOMER
+        }
     }
-    
-    ' --- Employee Management ---
-    package "Employee Management" {
-        usecase "View Employees" as UC_VIEW_EMPLOYEES
-        usecase "Create Employee" as UC_CREATE_EMPLOYEE
-        usecase "Update Employee" as UC_UPDATE_EMPLOYEE
-        usecase "Delete Employee" as UC_DELETE_EMPLOYEE
-    }
-    
-    ' --- Customer Management ---
-    package "Customer Management" {
-        usecase "View Customers" as UC_VIEW_CUSTOMERS
-        usecase "View Customer Details" as UC_VIEW_CUSTOMER
-        usecase "Create Customer" as UC_CREATE_CUSTOMER
-        usecase "Update Customer" as UC_UPDATE_CUSTOMER
-    }
+
+    ' ===== CUSTOMER ASSOCIATIONS =====
+    customer --- UC_CREATE_ORDER
+    customer --- UC_VIEW_ORDER
+    customer --- UC_VIEW_ITEMS
+    customer --- UC_VIEW_ITEM
+    customer --- UC_VIEW_CUSTOMER
+    customer --- UC_CREATE_CUSTOMER
+    customer --- UC_UPDATE_CUSTOMER
+
+    ' ===== EMPLOYEE STORE ASSOCIATIONS =====
+    emp_store --- UC_CREATE_ORDER
+    emp_store --- UC_VIEW_ORDER
+    emp_store --- UC_VIEW_ALL_ORDERS
+    emp_store --- UC_UPDATE_ORDER
+    emp_store --- UC_DELETE_ORDER
+    emp_store --- UC_DELIVER_ORDER
+    emp_store --- UC_UNDELIVERED
+    emp_store --- UC_VIEW_ITEMS
+    emp_store --- UC_VIEW_ITEM
+    emp_store --- UC_DISCOUNT
+    emp_store --- UC_VIEW_CUSTOMERS
+    emp_store --- UC_VIEW_CUSTOMER
+    emp_store --- UC_CREATE_CUSTOMER
+    emp_store --- UC_UPDATE_CUSTOMER
+
+    ' ===== EMPLOYEE LAB ASSOCIATIONS =====
+    emp_lab --- UC_VIEW_ITEMS
+    emp_lab --- UC_VIEW_ITEM
+    emp_lab --- UC_CREATE_ITEM
+    emp_lab --- UC_UPDATE_ITEM
+    emp_lab --- UC_DELETE_ITEM
+    emp_lab --- UC_DISCOUNT
+
+    ' ===== EMPLOYEE ADMINISTRATION ASSOCIATIONS =====
+    UC_VIEW_ORDER --- emp_admin
+    UC_VIEW_ALL_ORDERS --- emp_admin
+    UC_DELETE_ORDER --- emp_admin
+    UC_UNDELIVERED --- emp_admin
+    UC_ASSIGN_EMP --- emp_admin
+    UC_REMOVE_EMP --- emp_admin
+    UC_VIEW_EMPLOYEES --- emp_admin
+    UC_CREATE_EMPLOYEE --- emp_admin
+    UC_UPDATE_EMPLOYEE --- emp_admin
+    UC_DELETE_EMPLOYEE --- emp_admin
+    UC_VIEW_CUSTOMERS --- emp_admin
+    UC_VIEW_CUSTOMER --- emp_admin
+    UC_CREATE_CUSTOMER --- emp_admin
+    UC_UPDATE_CUSTOMER --- emp_admin
+
+    ' ===== EMPLOYEE ACCOUNTING ASSOCIATIONS =====
+    UC_VIEW_ORDER --- emp_accounting
+    UC_VIEW_ALL_ORDERS --- emp_accounting
+    UC_VIEW_ITEMS --- emp_accounting
+    UC_VIEW_ITEM --- emp_accounting
+    UC_UPDATE_ITEM --- emp_accounting
+    UC_DISCOUNT --- emp_accounting
 }
-
-' ===== CUSTOMER ASSOCIATIONS =====
-customer --> UC_CREATE_ORDER
-customer --> UC_VIEW_ORDER
-customer --> UC_VIEW_ITEMS
-customer --> UC_VIEW_ITEM
-customer --> UC_VIEW_CUSTOMER
-customer --> UC_CREATE_CUSTOMER
-customer --> UC_UPDATE_CUSTOMER
-
-' ===== EMPLOYEE STORE ASSOCIATIONS =====
-emp_store --> UC_CREATE_ORDER
-emp_store --> UC_VIEW_ORDER
-emp_store --> UC_VIEW_ALL_ORDERS
-emp_store --> UC_UPDATE_ORDER
-emp_store --> UC_DELETE_ORDER
-emp_store --> UC_DELIVER_ORDER
-emp_store --> UC_UNDELIVERED
-emp_store --> UC_VIEW_ITEMS
-emp_store --> UC_VIEW_ITEM
-emp_store --> UC_DISCOUNT
-emp_store --> UC_VIEW_CUSTOMERS
-emp_store --> UC_VIEW_CUSTOMER
-emp_store --> UC_CREATE_CUSTOMER
-emp_store --> UC_UPDATE_CUSTOMER
-
-' ===== EMPLOYEE LAB ASSOCIATIONS =====
-emp_lab --> UC_VIEW_ITEMS
-emp_lab --> UC_VIEW_ITEM
-emp_lab --> UC_CREATE_ITEM
-emp_lab --> UC_UPDATE_ITEM
-emp_lab --> UC_DELETE_ITEM
-emp_lab --> UC_DISCOUNT
-
-' ===== EMPLOYEE ADMINISTRATION ASSOCIATIONS =====
-emp_admin --> UC_VIEW_ORDER
-emp_admin --> UC_VIEW_ALL_ORDERS
-emp_admin --> UC_DELETE_ORDER
-emp_admin --> UC_UNDELIVERED
-emp_admin --> UC_ASSIGN_EMP
-emp_admin --> UC_REMOVE_EMP
-emp_admin --> UC_VIEW_EMPLOYEES
-emp_admin --> UC_CREATE_EMPLOYEE
-emp_admin --> UC_UPDATE_EMPLOYEE
-emp_admin --> UC_DELETE_EMPLOYEE
-emp_admin --> UC_VIEW_CUSTOMERS
-emp_admin --> UC_VIEW_CUSTOMER
-emp_admin --> UC_CREATE_CUSTOMER
-emp_admin --> UC_UPDATE_CUSTOMER
-
-' ===== EMPLOYEE ACCOUNTING ASSOCIATIONS =====
-emp_accounting --> UC_VIEW_ORDER
-emp_accounting --> UC_VIEW_ALL_ORDERS
-emp_accounting --> UC_VIEW_ITEMS
-emp_accounting --> UC_VIEW_ITEM
-emp_accounting --> UC_UPDATE_ITEM
-emp_accounting --> UC_DISCOUNT
 
 ' ===== NOTES =====
 note right of customer
@@ -134,14 +132,14 @@ note right of emp_lab
   - CRUD operations for Items
 end note
 
-note right of emp_admin
+note left of emp_admin
   Administration Employee (ADMIN):
   - Employee management
   - Assign employees to orders
   - Customer management
 end note
 
-note right of emp_accounting
+note left of emp_accounting
   Accounting Employee (ACCOUNTING):
   - View orders and reports
   - Update item prices
