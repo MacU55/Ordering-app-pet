@@ -71,13 +71,7 @@ public class ItemService {
 
     @Transactional
     public void deleteItem(long itemId) {
-        itemRepository.findById(itemId).ifPresentOrElse(
-            itemRepository::delete, () -> {
-                log.error("Item not found for uuid= {}", itemId);
-                throw new EntityNotFoundException("Item not found for uuid= " + itemId);
-            }
-        );
+        itemRepository.deleteById(itemId);
     }
-
 
 }

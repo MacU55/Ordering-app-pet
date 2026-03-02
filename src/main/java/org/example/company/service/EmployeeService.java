@@ -94,11 +94,6 @@ public class EmployeeService {
 
     @Transactional
     public void deleteEmployee(long id) {
-        if (employeeRepository.existsById(id)) {
             employeeRepository.deleteById(id);
-        } else {
-            log.error("Employee with uuid {} not found", id);
-            throw new EntityNotFoundException("Employee with uuid " + id + " not found");
         }
-    }
 }

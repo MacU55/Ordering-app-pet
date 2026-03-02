@@ -79,9 +79,6 @@ public class OrderItemService {
 
     @Transactional
     public void delete(long id) {
-        if (!orderItemRepository.existsById(id)) {
-            throw new EntityNotFoundException("OrderItem not found for uuid " + id);
-        }
         orderItemRepository.deleteById(id);
     }
 
