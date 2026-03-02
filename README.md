@@ -114,36 +114,43 @@ The application will start on `http://localhost:8080`
 ./gradlew bootRun --args='--spring.profiles.active=test'
 ```
 
-## Swagger UI
+## Swagger (SpringDoc OpenAPI)
 
-The application provides an interactive API documentation via Swagger UI (SpringDoc OpenAPI).
+The application exposes interactive API documentation via **SpringDoc OpenAPI 3**.
 
-### How to Access
+### URLs
 
-1. Start the application:
-   ```bash
-   ./gradlew bootRun
-   ```
+| Resource | URL |
+|----------|-----|
+| Swagger UI | http://localhost:8080/swagger-ui.html |
+| OpenAPI spec (JSON) | http://localhost:8080/v3/api-docs |
 
-2. Open Swagger UI in your browser:
-   ```
-   http://localhost:8080/swagger-ui.html
-   ```
-   or
-   ```
-   http://localhost:8080/swagger-ui/index.html
-   ```
+Swagger UI and API docs are publicly accessible (no authentication required).
 
-3. The OpenAPI specification (JSON) is available at:
-   ```
-   http://localhost:8080/v3/api-docs
-   ```
+### Configuration
+
+Swagger is configured in `application.yaml`:
+
+- **Operations** — Sorted by HTTP method
+- **Tags** — Sorted alphabetically
+- **Custom path** — `/swagger-ui.html` (alternate: `/swagger-ui/index.html`)
+
+### Request Headers
+
+All endpoints accept optional headers for role-based access. These are pre-configured in Swagger:
+
+| Header | Description |
+|--------|-------------|
+| `X-User-Email` | User identifier for requests |
+| `X-User-Role` | Role for authorization: `CUSTOMER`, `EMPLOYEE_STORE`, `EMPLOYEE_LAB`, `EMPLOYEE_ACCOUNTING`, `EMPLOYEE_ADMINISTRATION`, `SUPER_ADMIN` |
 
 ### Using Swagger UI
 
-- **Try it out** — Click "Try it out" on any endpoint to execute requests directly from the browser.
-- **Headers** — Use the Parameters section to add `X-User-Email` and `X-User-Role` headers for authenticated requests.
-- **Bootstrap (create first employee)** — Use `POST /employees/admin/employee` with header `X-User-Role: SUPER_ADMIN`.
+1. Start the application: `./gradlew bootRun`
+2. Open http://localhost:8080/swagger-ui.html
+3. Click **Try it out** on any endpoint to send requests
+4. Add `X-User-Role` (and optionally `X-User-Email`) in the Parameters section
+5. **Bootstrap** — Create the first employee: `POST /employees/admin/employee` with `X-User-Role: SUPER_ADMIN`
 
 ## API Documentation
 
@@ -163,23 +170,26 @@ See [API.md](API.md) for complete API documentation with curl examples.
 
 ```
 src/main/java/org/example/company/
-├── config/              # Configuration classes
 ├── controller/          # REST controllers
-│   └── errorHandling/   # Global exception handlers
+│   └── errorHandling/   # Global exception handler (GlobalExceptionHandler)
 ├── dto/
 │   ├── request/         # Request DTOs
 │   └── response/        # Response DTOs
-├── exceptions/          # Custom exceptions
-├── models/              # JPA entities
+│       └── error/       # Error response DTOs
+├── exception/           # Custom exceptions
+├── model/               # JPA entities
 ├── repository/          # Spring Data repositories
 ├── security/            # Role-based authorization
-│   ├── annotation/      # @IsAllowedByRole
-│   ├── aspect/          # AOP role checking
-│   ├── config/          # Security configuration
-│   ├── context/         # Role context (ThreadLocal)
+│   ├── config/          # Security + OpenAPI configuration
 │   ├── filter/          # X-User-Role header filter
-│   └── model/           # Roles enum
+│   └── model/           # Role types enum
 └── service/             # Business logic
+    ├── notification/    # Notification interfaces & implementations
+    │   └── impl/
+    ├── utility/         # Converters, loaders, helpers
+    │   ├── converter/
+    │   └── loader/
+    └── validation/      # Validation annotations & logic
 ```
 
 ## Building
